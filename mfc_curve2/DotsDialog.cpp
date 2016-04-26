@@ -10,7 +10,10 @@
 
 IMPLEMENT_DYNAMIC(DotsDialog, CDialog)
 
-DotsDialog::DotsDialog(CWnd* pParent): CDialog(DotsDialog::IDD, pParent) {}
+DotsDialog::DotsDialog(CWnd* pParent): CDialog(DotsDialog::type::IDD)
+{
+	
+}
 
 DotsDialog::~DotsDialog() {}
 
@@ -30,11 +33,11 @@ END_MESSAGE_MAP()
 
 void DotsDialog::OnBnClickedCancel()
 {
-
+	this->EndModalLoop(DotsDialog::r_button::CANCEL);
 }
 
 
 void DotsDialog::OnBnClickedAccept()
 {
-	// TODO: Add your control notification handler code here
+	this->EndModalLoop(DotsDialog::r_button::ACCEPT);
 }

@@ -1,5 +1,4 @@
 #include <string.h>
-#include <stdio.h>
 #include "mainwin.h"
 #include "res.h"
 CApp App;
@@ -24,7 +23,7 @@ CMainWin::CMainWin()
 afx_msg void CMainWin::OnCommand_PLOT()
 {
 	this->DDialog = new DotsDialog();
-	this->DDialog->DoModal();
+	DDialog->DoModal();
 }
 
 // Реализация карты сообщений
