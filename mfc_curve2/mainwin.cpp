@@ -1,6 +1,7 @@
 #include <string.h>
 #include "mainwin.h"
 #include "res.h"
+
 CApp App;
 
 BOOL CApp::InitInstance()
@@ -14,10 +15,14 @@ BOOL CApp::InitInstance()
 
 CMainWin::CMainWin()
 {
-	this->Create(0, TEXT("Простейшее приложение на MFC"));
+	this->Create(0, TEXT("Визуализация кривых второго порядка"),
+					WS_OVERLAPPEDWINDOW ^ WS_MAXIMIZEBOX);
 	this->m_wndMenu.LoadMenu(IDR_MENU1);	// Загрузить меню из файла ресурса
 	SetMenu(&m_wndMenu);					// Установить меню
 
+	CRect mainRect;
+	this->GetClientRect(mainRect);
+	this->MCanvas = new MainCanvas(this, &mainRect);
 }
 
 afx_msg void CMainWin::OnCommand_PLOT()

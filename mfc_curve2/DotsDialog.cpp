@@ -12,7 +12,7 @@ IMPLEMENT_DYNAMIC(DotsDialog, CDialog)
 
 DotsDialog::DotsDialog(CWnd* pParent): CDialog(DotsDialog::type::IDD)
 {
-	
+	// ... Точки
 }
 
 DotsDialog::~DotsDialog() {}
@@ -20,6 +20,7 @@ DotsDialog::~DotsDialog() {}
 void DotsDialog::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
+	// обратная связь с папой
 }
 
 
