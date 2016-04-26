@@ -25,7 +25,7 @@ CMainWin::CMainWin()
 	this->MCanvas = new MainCanvas(this, &mainRect);
 }
 
-afx_msg void CMainWin::OnCommand_PLOT()
+afx_msg void CMainWin::OnCommand_SHOW_DIALOG()
 {
 	this->DDialog = new DotsDialog();
 	DDialog->DoModal();
@@ -33,5 +33,5 @@ afx_msg void CMainWin::OnCommand_PLOT()
 
 // Реализация карты сообщений
 BEGIN_MESSAGE_MAP(CMainWin, CFrameWnd)
-	ON_COMMAND(ID_PLOT, OnCommand_PLOT)
+	ON_COMMAND(ID_PLOT, OnCommand_SHOW_DIALOG)
 END_MESSAGE_MAP()

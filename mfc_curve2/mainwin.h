@@ -9,7 +9,7 @@ class CMainWin: public CFrameWnd
 public:
 	CMainWin();
 // slots
-	afx_msg void OnCommand_PLOT();
+	afx_msg void OnCommand_SHOW_DIALOG();
 private:
 	CMenu m_wndMenu;
 	DotsDialog* DDialog;
