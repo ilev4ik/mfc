@@ -1,3 +1,6 @@
+#ifndef AUTOMATO
+#define AUTOMATO
+
 #include <afxwin.h>
 #include <map>
 
@@ -8,6 +11,9 @@ public:
 	void START();
 	CString getResult();
 	void inRightOrder();
+
+	typedef std::map <CString, DOUBLE> comp_map;
+	comp_map eq_map;
 private:
 	void Analise();
 	void toNormalForm();
@@ -17,8 +23,10 @@ private:
 		VAR,
 		PM
 	} state;
+
 	CString var, coef;
 	CString EQ;
 	char ch, pm;
-	std::map <CString, DOUBLE> eq_map;
 };
+
+#endif

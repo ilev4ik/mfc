@@ -58,6 +58,7 @@ void FiniteAutomato::START()
 
 	ch = ::tolower(EQ[1]);
 	this->Analise();
+	int a = 5;
 }
 
 void FiniteAutomato::Analise()
@@ -105,14 +106,20 @@ void FiniteAutomato::Analise()
 		}
 		else if (ch == '-' || ch == '+')
 		{
-			eq_map[var] += _wtoi(coef);
+			eq_map[var] += _wtof(coef);
 			coef = "", var = "c";
 			state = PM;
 			pm = ch;
 		}
 		else if (ch == '=')
 		{
-			eq_map[var] += _wtoi(coef);
+			eq_map[var] += _wtof(coef);
+		}
+		else if (ch == '.')
+		{
+			char d = EQ[++i];
+			coef += ch;
+			coef += d;
 		}
 
 		if (var == "yx")

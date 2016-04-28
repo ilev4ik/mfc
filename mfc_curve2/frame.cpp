@@ -2,6 +2,11 @@
 #include "res.h"
 #include "automato.h"
 
+
+// убрать
+#include "mathground.h"
+#include <iostream>
+
 LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect) 
 {
 	this->Create(
@@ -35,6 +40,7 @@ LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect)
 	EQEditOld->Create(WS_BORDER, r_edit, this, NULL);
 	this->LoadAccelTable(MAKEINTRESOURCE(IDR_ACCELERATOR1));
 	EQEditOld->ShowWindow(SW_RESTORE);
+
 }
 
 RightTopFrame::RightTopFrame(CWnd* pWnd, CRect rect)
@@ -46,6 +52,8 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect rect)
 		pWnd
 		);
 	this->ShowWindow(SW_SHOW);
+
+	
 }
 
 LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
@@ -98,4 +106,6 @@ afx_msg void LeftTopFrame::OnEnter()
 	EQEditOld->SetFocus();
 	EQEditOld->SetSel(0, -1);	// select all text and move cursor at the end
 	EQEditOld->SetSel(-1);		// caret is on the last position
+
+	MathTool tool(CurveEq.eq_map);
 }
