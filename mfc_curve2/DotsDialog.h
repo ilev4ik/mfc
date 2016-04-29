@@ -1,5 +1,6 @@
 #pragma once
 #include "res.h"
+#include <afxwin.h>
 
 // DotsDialog dialog
 

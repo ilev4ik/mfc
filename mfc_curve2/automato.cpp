@@ -13,6 +13,8 @@ FiniteAutomato::FiniteAutomato(CString str) : EQ(str), var("c")
 void FiniteAutomato::toNormalForm()
 {
 	int N = this->EQ.GetLength();
+	if (N == 1) return;
+
 	if (EQ[N - 2] == '=' && EQ[N - 1] == '0')
 		return;
 

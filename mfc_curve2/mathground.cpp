@@ -237,6 +237,20 @@ void MathTool::setEqExcent()
 	ss << "y^2=" << std::fixed;
 	ss << std::setprecision(1) << 2 * cp << "x-(1-" <<
 		e*e << ")x^2";
+
+	std::string str = ss.str();
+	this->Y_exc = str.c_str();
+}
+
+void MathTool::setPolar()
+{
+	std::stringstream ss;
+	ss << "rho=" << std::fixed;
+	ss << cp << "/(1+" << std::setprecision(1) <<
+		e << "*cos(phi))";
+
+	std::string str = ss.str();
+	this->polar = str.c_str();
 }
 
 MathTool::~MathTool()

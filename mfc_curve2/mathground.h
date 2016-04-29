@@ -32,6 +32,20 @@ public:
 	MathTool(const std::map <CString, DOUBLE>);
 	~MathTool();
 	SquareMatrix a;
+
+	// left bottom frame
+	CString F_xy;			// характеристическая форма
+	double L1, L2;			// Корни хар. ур-я
+	double Delta, D, I, B;	// Инварианты
+	CString clif;			// CLassIFication
+	CString canonical;		// канонический вид
+	double ca, cb, cp;		// coef a,b,p
+	CPoint* focus;			// фокус(ы)
+	double e, *dir;			// экцентриситет и директриса
+
+	// right bottom frame
+	CString Y_exc;			// уравнение через экцентриситет
+	CString polar;			// в полярных координатах
 private:
 	void setInvariants();
 	void setQuadraticForm();
@@ -41,6 +55,7 @@ private:
 	void setSubscribtion();
 	void setFDE();
 	void setEqExcent();
+	void setPolar();
 
 	enum CurveType {
 		_ERROR,
@@ -52,18 +67,6 @@ private:
 		PARALLEL,
 		COINCIDING
 	} CURVE_STATE = _ERROR;
-
-	CPoint* focus;
-	CString direct;
-	CString excent;
-	double Delta, D, I, B;	// Инварианты
-	double L1, L2;			// Корни хар. ур-я
-	CString F_xy;
-	CString Y_exc;			// уравнение через экцентриситет
-	CString clif;			// CLassIFication
-	CString canonical;
-	double ca, cb, cp;		// coef a,b,p
-	double e, *dir;
 };
 
 #endif
