@@ -8,6 +8,7 @@ class MainCanvas: public CFrameWnd
 {
 public:
 	MainCanvas(CWnd*, const CRect &);
+	~MainCanvas();
 private:
 	LeftTopFrame*		frame_LT;	// top left
 	RightTopFrame*		frame_RT;	// top right

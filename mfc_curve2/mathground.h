@@ -8,13 +8,14 @@ class SquareMatrix
 {
 public:
 	SquareMatrix();
+	~SquareMatrix();
 	double& operator() (int i, int j);
 private:
 	double** matrix;
 };
 
 // порядок важен! должен совпадать с enum CurveType в след. классе
-const std::string STR_CurveType[] = {
+const std::string CanonicalView[] = {
 	"No real points determined",
 	"x^2/a^2+y^2/b^2=1",
 	"x^2/a^2-y^2/b^2=1",
@@ -29,12 +30,17 @@ class MathTool
 {
 public:
 	MathTool(const std::map <CString, DOUBLE>);
+	~MathTool();
 	SquareMatrix a;
 private:
 	void setInvariants();
 	void setQuadraticForm();
 	void setLambdas();
 	void setClassification();
+	void setCanonical();
+	void setSubscribtion();
+	void setFDE();
+	void setEqExcent();
 
 	enum CurveType {
 		_ERROR,
@@ -47,10 +53,17 @@ private:
 		COINCIDING
 	} CURVE_STATE = _ERROR;
 
+	CPoint* focus;
+	CString direct;
+	CString excent;
 	double Delta, D, I, B;	// Инварианты
 	double L1, L2;			// Корни хар. ур-я
 	CString F_xy;
+	CString Y_exc;			// уравнение через экцентриситет
 	CString clif;			// CLassIFication
+	CString canonical;
+	double ca, cb, cp;		// coef a,b,p
+	double e, *dir;
 };
 
 #endif

@@ -43,6 +43,12 @@ LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect)
 
 }
 
+LeftTopFrame::~LeftTopFrame()
+{
+	delete EQEditOld;
+	delete EQLabel;
+}
+
 RightTopFrame::RightTopFrame(CWnd* pWnd, CRect rect)
 {
 	this->Create(

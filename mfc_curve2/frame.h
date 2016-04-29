@@ -7,6 +7,7 @@ class LeftTopFrame: public CFrameWnd
 {
 public:
 	LeftTopFrame(CWnd*, CRect);
+	~LeftTopFrame();
 private:
 	CEdit* EQEditOld;
 	CStatic* EQLabel;

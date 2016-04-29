@@ -3,7 +3,9 @@
 #include <iomanip>
 
 #define DIM 3
+#define EPS 1e-4
 
+// мб не понадобиться:)
 CString operator+ (double l, CString r)
 {
 	if (l == 0.) return "";
@@ -32,6 +34,7 @@ MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 	this->setQuadraticForm();
 	this->setLambdas();
 	this->setClassification();
+	this->setCanonical();
 }
 
 void MathTool::setInvariants()
@@ -159,12 +162,104 @@ void MathTool::setClassification()
 	this->clif = str.c_str();
 }
 
+void MathTool::setCanonical()
+{
+	this->canonical = CanonicalView[CURVE_STATE].c_str();
+}
+
+void MathTool::setSubscribtion()
+{
+	if (CURVE_STATE == ELLIPS || CURVE_STATE == DOT)
+	{
+		ca = -1 / L2 * Delta / D;
+		cb = -1 / L1 * Delta / D;
+		cp = cb*cb / ca;
+	}
+	else if (CURVE_STATE == HIPERBOLA || CURVE_STATE == INTERSECTING)
+	{
+		ca = -1 / L1 * Delta / D;
+		cb = 1 / L2 * Delta / D;
+		cp = cb*cb / ca;
+	}
+	else if (CURVE_STATE == PARABOLA)	
+	{
+		cp = 1 / I*std::sqrt(-Delta / I);
+	}
+	else if (CURVE_STATE == PARALLEL)
+	{
+		ca = std::sqrt(a(3, 3)/a(1,1));
+	}
+	else if (CURVE_STATE == COINCIDING)
+	{
+		ca = std::sqrt(1/a(1,1));
+	}
+	else ca = cb = cp = 0;			// потому что это мнимые случаи, а мы их 
+									// запихнули в ERROR, т.к. нет графика 
+									// на вещ. оси
+}
+
+void MathTool::setFDE()
+{
+	switch (CURVE_STATE)
+	{
+	case HIPERBOLA:
+		focus = new CPoint[2];
+		focus[0].y = focus[1].y = 0;
+		focus[0].x = ca / 2;
+		focus[1].x = cb / 2;
+		e = std::sqrt(ca*ca + cb*cb) / ca;
+		dir = new double[2];
+		dir[0] = ca / e;
+		dir[1] = -ca / e;
+		cp = cb*cb / ca;
+	case PARABOLA:
+		focus = new CPoint[1];
+		focus[0] = cp / 2;
+		e = std::sqrt(1 + (cb*cb) / (ca*ca));
+		dir = new double[1];
+		dir[0] = -cp / 2;
+	case ELLIPS:
+		e = std::sqrt(1 - (cb*cb) / (ca*ca));
+		dir = new double[2];
+		dir[0] = dir[1] = cp / (e*(1+e));
+		dir[1] *= -1;
+		focus = new CPoint[2];
+		focus[0].x = focus[1].x = cp / (1 + e);
+		focus[0].x *= -1;
+		focus[0].y = focus[1].y = 0;
+		cp = cb*cb / ca;
+	}
+}
+
+void MathTool::setEqExcent()
+{
+	std::stringstream ss;
+	ss << "y^2=" << std::fixed;
+	ss << std::setprecision(1) << 2 * cp << "x-(1-" <<
+		e*e << ")x^2";
+}
+
+MathTool::~MathTool()
+{
+	delete[] focus;
+	delete[] dir;
+}
+
 SquareMatrix::SquareMatrix()
 {
 	matrix = new double*[DIM];
 
 	for (int i = 0; i < DIM; ++i)
 		matrix[i] = new double[DIM];
+}
+
+SquareMatrix::~SquareMatrix()
+{
+	for (int i = 0; i < DIM; ++i)
+	{
+		delete[] matrix[i];
+	}
+	delete[] matrix;
 }
 
 double& SquareMatrix::operator() (int i, int j)
