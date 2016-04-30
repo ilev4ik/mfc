@@ -40,7 +40,7 @@ public:
 	double Delta, D, I, B;		// Инварианты
 	CString clif;				// CLassIFication
 	CString canonical;			// канонический вид
-	double ca, cb, cp;			// coef a,b,p
+	double ca2, cb2, cp;		// coef a,b,p
 	std::vector <CPoint> focus;	// фокус(ы)
 	double e;					// экцентриситет и директриса
 	std::vector <double> dir;

@@ -94,8 +94,8 @@ void CMainWin::setInfo_LB()
 	str += TEXT("Характеристическая форма: ") + tool->F_xy + TEXT('\n');
 
 	ss << std::fixed << std::setprecision(2);
-	ss << "Корни характеристического уравнения: " << tool->L1 
-		<< ", " << tool->L2 << '\n';
+	ss << "Корни характеристического уравнения: L1=" << tool->L1 
+		<< ", L2=" << tool->L2 << '\n';
 
 	ss << "Инварианты: Delta = " << tool->Delta << ", "
 		<< "D=" << tool->D << ", I=" << tool->I << ", B=" << tool->B << '\n';
@@ -107,8 +107,9 @@ void CMainWin::setInfo_LB()
 	str += TEXT("Классификация: ") + tool->clif + '\n';
 	str += TEXT("Канонический вид: ") + tool->canonical + '\n';
 
-	ss.flush();
-	ss << "Замена к каноническому виду: a=" << tool->ca << ", b=" << tool->cb << ", p=" << tool->cp << '\n';
+	ss.str(std::string());
+	ss.clear();
+	ss << "Замена к каноническому виду: a^2=" << tool->ca2 << ", b^2=" << tool->cb2 << ", p=" <<tool->cp << '\n';
 	ss << "Фокус(ы): ";
 	for (int i = 0; i < tool->focus.size(); ++i)
 	{

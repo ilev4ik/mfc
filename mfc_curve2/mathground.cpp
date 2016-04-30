@@ -159,15 +159,15 @@ void MathTool::setSubscribtion()
 {
 	if (CURVE_STATE == ELLIPS || CURVE_STATE == DOT)
 	{
-		ca = -1 / L2 * Delta / D;
-		cb = -1 / L1 * Delta / D;
-		cp = cb*cb / ca;
+		ca2 = -(1 / L2) * (Delta / D);
+		cb2 = -(1 / L1) * (Delta / D);
+		cp = cb2 / std::sqrt(ca2);
 	}
 	else if (CURVE_STATE == HIPERBOLA || CURVE_STATE == INTERSECTING)
 	{
-		ca = -1 / L1 * Delta / D;
-		cb = 1 / L2 * Delta / D;
-		cp = cb*cb / ca;
+		ca2 = -1 / L1 * Delta / D;
+		cb2 = 1 / L2 * Delta / D;
+		cp = cb2 / std::sqrt(ca2);
 	}
 	else if (CURVE_STATE == PARABOLA)	
 	{
@@ -175,15 +175,16 @@ void MathTool::setSubscribtion()
 	}
 	else if (CURVE_STATE == PARALLEL)
 	{
-		ca = std::sqrt(a(3, 3)/a(1,1));
+		double aa = a(3, 3);
+		ca2 = -a(3, 3)/a(1,1);
 	}
 	else if (CURVE_STATE == COINCIDING)
 	{
-		ca = std::sqrt(1/a(1,1));
+		ca2 = 1/a(1,1);
 	}
-	else ca = cb = cp = 0;			// потому что это мнимые случаи, а мы их 
+	else ca2 = cb2 = cp = 0;			// потому что это мнимые случаи, а мы их 
 									// запихнули в ERROR, т.к. нет графика 
-									// на вещ. оси
+									// в вещ. координатах
 }
 
 void MathTool::setFDE()
@@ -191,24 +192,26 @@ void MathTool::setFDE()
 	switch (CURVE_STATE)
 	{
 	case HIPERBOLA:
-		focus.push_back(CPoint(ca/2,0));
-		focus.push_back(CPoint(cb / 2, 0));
-		e = std::sqrt(ca*ca + cb*cb) / ca;
-		dir.push_back(ca / e);
-		dir.push_back(-ca / e);
-		cp = cb*cb / ca;
+		focus.push_back(CPoint(std::sqrt(ca2)/2, 0));
+		focus.push_back(CPoint(std::sqrt(cb2)/ 2, 0));
+		e = std::sqrt(ca2 + cb2) / std::sqrt(ca2);
+		dir.push_back(std::sqrt(ca2) / e);
+		dir.push_back(-std::sqrt(ca2) / e);
+		cp = cb2 / std::sqrt(ca2);
+		break;
 	case PARABOLA:
 		focus.push_back(CPoint(cp / 2,0));
-		e = std::sqrt(1 + (cb*cb) / (ca*ca));
+		e = std::sqrt(1 + cb2 / ca2);
 		dir.push_back(-cp / 2);
+		break;
 	case ELLIPS:
-		e = std::sqrt(1 - (cb*cb) / (ca*ca));
-		
+		e = std::sqrt(1 - cb2 / ca2);
 		dir.push_back(cp / (e*(1 + e)));
 		dir.push_back(-cp / (e*(1 + e)));
 		focus.push_back(CPoint(-cp / (1 + e), 0));
 		focus.push_back(CPoint(cp / (1 + e), 0));
-		cp = cb*cb / ca;
+		cp = cb2 / std::sqrt(ca2);
+		break;
 	}
 }
 

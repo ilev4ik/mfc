@@ -78,13 +78,13 @@ LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
 	this->GetClientRect(rr);
 	CRect r_lbl(
 		rr.left + 5,
-		rr.top,
-		rr.right - 10,
-		rr.bottom
+		(rr.bottom - rr.top)/11,
+		rr.right - 5,
+		rr.bottom - (rr.bottom - rr.top) / 11
 		);
 
 	InfoLabel = new CStatic();
-	InfoLabel->Create(TEXT("Общие сведения о кривой:\n"), WS_BORDER, r_lbl, this);
+	InfoLabel->Create(TEXT("Общие сведения о кривой:\n\n"), WS_BORDER, r_lbl, this);
 	InfoLabel->ShowWindow(SW_RESTORE);
 }
 
