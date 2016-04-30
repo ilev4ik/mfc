@@ -1,7 +1,8 @@
 #include <string.h>
 #include "mainwin.h"
 #include "res.h"
-#include "automato.h"
+#include <sstream>
+#include <iomanip>
 
 CApp App;
 
@@ -63,11 +64,81 @@ afx_msg void CMainWin::OnEnter()
 	this->frame_LT->EQEditOld->GetWindowTextW(EQ);
 
 	// Конечный автомат для разбора строки
-	FiniteAutomato CurveEq(EQ);
-	CurveEq.START();
+	this->CurveEq = new FiniteAutomato(EQ);
+	CurveEq->START();
+	this->tool = new MathTool(CurveEq->eq_map);
 
-	this->frame_LT->EQEditOld->SetWindowTextW(CurveEq.getResult());
+	this->setInfro_LT();
+	this->setInfo_LB();
+
+}
+
+CString operator+ (CString l, double r)
+{
+	CString str;
+	str.Format(TEXT("%f"), r);
+	return str + l;
+}
+
+std::stringstream& operator<< (std::stringstream& ss, const CPoint& p)
+{
+	ss << "(" << p.x << "," << p.y << ")";
+	return ss;
+}
+
+void CMainWin::setInfo_LB()
+{
+	std::stringstream ss;
+
+	CString str("Общие сведения о кривой:\n");
+	str += TEXT("Характеристическая форма: ") + tool->F_xy + TEXT('\n');
+
+	ss << std::fixed << std::setprecision(2);
+	ss << "Корни характеристического уравнения: " << tool->L1 
+		<< ", " << tool->L2 << '\n';
+
+	ss << "Инварианты: Delta = " << tool->Delta << ", "
+		<< "D=" << tool->D << ", I=" << tool->I << ", B=" << tool->B << '\n';
+
+	std::string s = ss.str();
+	CString c = s.c_str();
+	str += c;
+
+	str += TEXT("Классификация: ") + tool->clif + '\n';
+	str += TEXT("Канонический вид: ") + tool->canonical + '\n';
+
+	ss.flush();
+	ss << "Замена к каноническому виду: a=" << tool->ca << ", b=" << tool->cb << ", p=" << tool->cp << '\n';
+	ss << "Фокус(ы): ";
+	for (int i = 0; i < tool->focus.size(); ++i)
+	{
+		ss << "F_" << i + 1 << "=";
+		ss << tool->focus[i] << " ";
+	}
+	ss << "\n";
+	ss << "Эксцентриситет: " << tool->e << '\n';
+	ss << "Директриса(ы):";
+
+	for (int i = 0; i < tool->dir.size(); ++i)
+	{
+		ss << "x=" << tool->dir[i] << ", ";
+	}
+	ss << "\n";
+	s = ss.str();
+	c = s.c_str();
+	str += c;
+	this->frame_LB->InfoLabel->SetWindowTextW(str);
+}
+
+void CMainWin::setInfro_LT()
+{
+	this->frame_LT->EQEditOld->SetWindowTextW(CurveEq->getResult());
 	this->frame_LT->EQEditOld->SetFocus();
 	this->frame_LT->EQEditOld->SetSel(0, -1);	// select all text and move cursor at the end
 	this->frame_LT->EQEditOld->SetSel(-1);		// caret is on the last position	
+}
+
+void CMainWin::setInfo_RB()
+{
+
 }

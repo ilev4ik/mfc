@@ -78,9 +78,9 @@ LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
 	this->GetClientRect(rr);
 	CRect r_lbl(
 		rr.left + 5,
-		(rr.bottom - rr.top) / 7,
+		rr.top,
 		rr.right - 10,
-		rr.bottom - (rr.bottom - rr.top) / 7
+		rr.bottom
 		);
 
 	InfoLabel = new CStatic();

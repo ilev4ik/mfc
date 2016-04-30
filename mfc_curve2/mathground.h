@@ -3,6 +3,7 @@
 
 #include <map>
 #include <afxwin.h>
+#include <vector>
 
 class SquareMatrix
 {
@@ -30,18 +31,19 @@ class MathTool
 {
 public:
 	MathTool(const std::map <CString, DOUBLE>);
-	~MathTool();
+
 	SquareMatrix a;
 
 	// left bottom frame
-	CString F_xy;			// характеристическая форма
-	double L1, L2;			// Корни хар. ур-я
-	double Delta, D, I, B;	// Инварианты
-	CString clif;			// CLassIFication
-	CString canonical;		// канонический вид
-	double ca, cb, cp;		// coef a,b,p
-	CPoint* focus;			// фокус(ы)
-	double e, *dir;			// экцентриситет и директриса
+	CString F_xy;				// характеристическая форма
+	double L1, L2;				// Корни хар. ур-я
+	double Delta, D, I, B;		// Инварианты
+	CString clif;				// CLassIFication
+	CString canonical;			// канонический вид
+	double ca, cb, cp;			// coef a,b,p
+	std::vector <CPoint> focus;	// фокус(ы)
+	double e;					// экцентриситет и директриса
+	std::vector <double> dir;
 
 	// right bottom frame
 	CString Y_exc;			// уравнение через экцентриситет
@@ -67,6 +69,7 @@ private:
 		PARALLEL,
 		COINCIDING
 	} CURVE_STATE = _ERROR;
+
 };
 
 #endif

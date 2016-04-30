@@ -3,6 +3,8 @@
 
 #include "DotsDialog.h"
 #include "frame.h"
+#include "automato.h"
+#include "mathground.h"
 
 class CMainWin: public CFrameWnd
 {
@@ -11,7 +13,13 @@ public:
 // slots
 	afx_msg void OnCommand_SHOW_DIALOG();
 	afx_msg void OnEnter();
+
+	void setInfro_LT();
+	void setInfo_LB();
+	void setInfo_RB();
 private:
+	FiniteAutomato* CurveEq;
+	MathTool* tool;
 	CMenu m_wndMenu;
 	DotsDialog* DDialog;	
 	LeftBottomFrame*	frame_LB;

@@ -5,22 +5,6 @@
 #define DIM 3
 #define EPS 1e-4
 
-// мб не понадобиться:)
-CString operator+ (double l, CString r)
-{
-	if (l == 0.) return "";
-	CString str;
-	str.Format(TEXT("%f"), l);
-	return str+r;
-}
-
-CString operator+ (CString l, double r)
-{
-	CString str;
-	str.Format(TEXT("%f"), r);
-	return str+l;
-}
-
 MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 {
 	a(1, 1) = EQ["x^2"];
@@ -35,6 +19,10 @@ MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 	this->setLambdas();
 	this->setClassification();
 	this->setCanonical();
+	this->setSubscribtion();
+	this->setFDE();
+	this->setEqExcent();
+	this->setPolar();
 }
 
 void MathTool::setInvariants()
@@ -203,30 +191,23 @@ void MathTool::setFDE()
 	switch (CURVE_STATE)
 	{
 	case HIPERBOLA:
-		focus = new CPoint[2];
-		focus[0].y = focus[1].y = 0;
-		focus[0].x = ca / 2;
-		focus[1].x = cb / 2;
+		focus.push_back(CPoint(ca/2,0));
+		focus.push_back(CPoint(cb / 2, 0));
 		e = std::sqrt(ca*ca + cb*cb) / ca;
-		dir = new double[2];
-		dir[0] = ca / e;
-		dir[1] = -ca / e;
+		dir.push_back(ca / e);
+		dir.push_back(-ca / e);
 		cp = cb*cb / ca;
 	case PARABOLA:
-		focus = new CPoint[1];
-		focus[0] = cp / 2;
+		focus.push_back(CPoint(cp / 2,0));
 		e = std::sqrt(1 + (cb*cb) / (ca*ca));
-		dir = new double[1];
-		dir[0] = -cp / 2;
+		dir.push_back(-cp / 2);
 	case ELLIPS:
 		e = std::sqrt(1 - (cb*cb) / (ca*ca));
-		dir = new double[2];
-		dir[0] = dir[1] = cp / (e*(1+e));
-		dir[1] *= -1;
-		focus = new CPoint[2];
-		focus[0].x = focus[1].x = cp / (1 + e);
-		focus[0].x *= -1;
-		focus[0].y = focus[1].y = 0;
+		
+		dir.push_back(cp / (e*(1 + e)));
+		dir.push_back(-cp / (e*(1 + e)));
+		focus.push_back(CPoint(-cp / (1 + e), 0));
+		focus.push_back(CPoint(cp / (1 + e), 0));
 		cp = cb*cb / ca;
 	}
 }
@@ -251,12 +232,6 @@ void MathTool::setPolar()
 
 	std::string str = ss.str();
 	this->polar = str.c_str();
-}
-
-MathTool::~MathTool()
-{
-	delete[] focus;
-	delete[] dir;
 }
 
 SquareMatrix::SquareMatrix()
