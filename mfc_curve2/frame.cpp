@@ -102,4 +102,77 @@ RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
 		pWnd
 		);
 	this->ShowWindow(SW_SHOW);
+
+	CRect r;
+	this->GetClientRect(r);
+
+	CRect p_lbl(
+		(r.right - r.left) / 10,
+		(r.bottom - r.top) / 6,
+		r.right - (r.right - r.left) / 10,
+		(r.bottom - r.top) / 6 + 20
+		);
+
+	CRect e_lbl(
+		p_lbl.left,
+		p_lbl.bottom + 10,
+		p_lbl.right,
+		p_lbl.bottom + 30
+		);
+
+	polar = new CStatic();
+	polar->Create(TEXT("”равнение в пол€рных координатах..."), WS_BORDER, p_lbl, this);
+	polar->ShowWindow(SW_RESTORE);
+
+	excent = new CStatic();
+	excent->Create(TEXT("”равнение через эксцентриситет..."), WS_BORDER, e_lbl, this);
+	excent->ShowWindow(SW_RESTORE);
+
+	CRect sp_rect(
+		e_lbl.left,
+		e_lbl.bottom + 10,
+		e_lbl.right / 2,
+		e_lbl.bottom + 50
+		);
+
+	CRect se_rect(
+		sp_rect.left,
+		sp_rect.bottom + 10,
+		e_lbl.right / 2,
+		sp_rect.bottom + 50
+		);
+
+	pSlider = new CSliderCtrl();
+	pSlider->Create(TBS_TOOLTIPS, sp_rect, this, ID_PSLIDER);
+	pSlider->SetRange(0, 50, TRUE);
+	pSlider->ShowWindow(SW_RESTORE);
+
+
+	eSlider = new CSliderCtrl();
+	eSlider->Create(TBS_TOOLTIPS, se_rect, this, ID_ESLIDER);
+	eSlider->SetRange(0, 50, TRUE);
+	eSlider->ShowWindow(SW_RESTORE);
+
+	e = new CStatic();
+	CRect rp(
+		sp_rect.right+5,
+		sp_rect.top,
+		p_lbl.right,
+		sp_rect.bottom
+		);
+
+	CRect re(
+		se_rect.right + 5,
+		se_rect.top,
+		p_lbl.right,
+		se_rect.bottom
+		);
+
+	p = new CStatic();
+	p->Create(TEXT("<-- динамическое изменение фокального параметра"), NULL, rp, this);
+	p->ShowWindow(SW_RESTORE);
+
+	e = new CStatic();
+	e->Create(TEXT("<-- динамическое изменение эксцентриситета"), NULL, re, this);
+	e->ShowWindow(SW_RESTORE);
 }

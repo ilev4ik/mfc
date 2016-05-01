@@ -2,6 +2,7 @@
 #define FRAMES
 
 #include <afxwin.h>
+#include <afxcmn.h>
 
 class LeftTopFrame: public CFrameWnd
 {
@@ -10,7 +11,7 @@ public:
 	~LeftTopFrame();
 	CEdit* EQEditOld;
 	CStatic* EQLabel;
-public:
+
 	afx_msg void OnShift2();
 	DECLARE_MESSAGE_MAP()
 };
@@ -33,6 +34,12 @@ class RightBottomFrame: public CFrameWnd
 {
 public:
 	RightBottomFrame(CWnd*, CRect);
+	CSliderCtrl* pSlider;
+	CSliderCtrl* eSlider;
+	CStatic* polar;
+	CStatic* excent;
+	CStatic* p;
+	CStatic* e;
 };
 
 #endif

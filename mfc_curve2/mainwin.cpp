@@ -70,7 +70,7 @@ afx_msg void CMainWin::OnEnter()
 
 	this->setInfro_LT();
 	this->setInfo_LB();
-
+	this->setInfo_RB();
 }
 
 CString operator+ (CString l, double r)
@@ -141,5 +141,6 @@ void CMainWin::setInfro_LT()
 
 void CMainWin::setInfo_RB()
 {
-
+	this->frame_RB->polar->SetWindowTextW(tool->polar);
+	this->frame_RB->excent->SetWindowTextW(tool->Y_exc);
 }

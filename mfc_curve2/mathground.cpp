@@ -229,8 +229,8 @@ void MathTool::setEqExcent()
 void MathTool::setPolar()
 {
 	std::stringstream ss;
-	ss << "rho=" << std::fixed;
-	ss << cp << "/(1+" << std::setprecision(1) <<
+	ss << "R=" << std::fixed;
+	ss << std::setprecision(1) << cp << "/(1+" <<
 		e << "*cos(phi))";
 
 	std::string str = ss.str();
