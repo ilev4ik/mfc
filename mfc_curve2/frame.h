@@ -7,8 +7,10 @@
 class LeftTopFrame: public CFrameWnd
 {
 public:
+	friend class CMainWin;
 	LeftTopFrame(CWnd*, CRect);
 	~LeftTopFrame();
+private:
 	CEdit* EQEditOld;
 	CStatic* EQLabel;
 
@@ -19,21 +21,35 @@ public:
 class RightTopFrame: public CFrameWnd
 {
 public:
+	friend class CMainWin;
+
 	RightTopFrame(CWnd*, CRect);
+	afx_msg BOOL OnEraseBkgnd(CDC*);
+	afx_msg void OnPaint();
+private:
+	CDC m_memDC;
+	CBitmap m_bmp;
+	CBrush m_bkbrush;
+	CRect rect;
+	DECLARE_MESSAGE_MAP()
 };
 
 class LeftBottomFrame: public CFrameWnd
 {
 public:
+	friend class CMainWin;
 	LeftBottomFrame(CWnd*, CRect);
 	~LeftBottomFrame();
+private:
 	CStatic* InfoLabel;
 };
 
 class RightBottomFrame: public CFrameWnd
 {
 public:
+	friend class CMainWin;
 	RightBottomFrame(CWnd*, CRect);
+private:
 	CSliderCtrl* pSlider;
 	CSliderCtrl* eSlider;
 	CStatic* polar;

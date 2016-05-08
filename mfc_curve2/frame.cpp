@@ -61,37 +61,69 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect rect)
 		rect,
 		pWnd
 		);
-	this->ShowWindow(SW_SHOW);
+
+	// создаём контекст устройства (нашего текущего фрейма)
+	CClientDC dc(this);
+	this->GetClientRect(this->rect);
+	int maxX = rect.right - rect.left;
+	int maxY = rect.right - rect.left;
+
+	// Создание совместимого контекста устройства и
+	// битового образа для использования
+	// его в качестве буфера изображения
+
+	m_memDC.CreateCompatibleDC(&dc);
+	m_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
+
+	m_memDC.SelectObject(&m_bmp);
+	m_bkbrush.CreateStockObject(WHITE_BRUSH); // для стирания фона (белая кисть)
+	m_memDC.SelectObject(&m_bkbrush);
+
+	// копируем контекст устройства на битмап
+	m_memDC.PatBlt(0, 0, maxX, maxY, PATCOPY);
+	this->ShowWindow(SW_RESTORE);
+	this->UpdateWindow();	// signal to OnPaint
 }
 
-LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
+afx_msg BOOL RightTopFrame::OnEraseBkgnd(CDC* pDC)
 {
-	this->Create(
-		NULL, TEXT(""),
-		WS_BORDER | WS_CHILD,
-		rect,
-		pWnd
-		);
-	this->ShowWindow(SW_SHOW);
+	CPen pen(PS_SOLID, 1, BLACK_PEN);
+	pDC->SelectObject(pen);
+	const DOUBLE XNUM = 6, YNUM = 4;
+	// Рисуем координатные оси и отметки важные
+	// вертикально:
+	for (
+		DOUBLE i = rect.left + (rect.right - rect.left) / XNUM;
+		i < rect.right; 
+		i += (rect.right - rect.left) / XNUM
+		)
+	{
+		pDC->MoveTo(i, 0);
+		pDC->LineTo(i, rect.bottom);
+	}
 
-	CRect rr;
-	this->GetClientRect(rr);
-	CRect r_lbl(
-		rr.left + 5,
-		(rr.bottom - rr.top)/11,
-		rr.right - 5,
-		rr.bottom - (rr.bottom - rr.top) / 11
-		);
-
-	InfoLabel = new CStatic();
-	InfoLabel->Create(TEXT("Общие сведения о кривой:\n\n"), WS_BORDER, r_lbl, this);
-	InfoLabel->ShowWindow(SW_RESTORE);
+	for (
+		DOUBLE j = rect.top + (rect.bottom - rect.top) / YNUM;
+		j < rect.bottom;
+	j += (rect.bottom - rect.top) / YNUM
+		)
+	{
+		pDC->MoveTo(0, j);
+		pDC->LineTo(rect.right, j);
+	}
+	return TRUE;
 }
 
-LeftBottomFrame::~LeftBottomFrame()
+afx_msg void RightTopFrame::OnPaint()
 {
-	delete InfoLabel;
+
 }
+
+BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
+	ON_WM_ERASEBKGND()
+	ON_WM_PAINT()
+	ON_WM_DESTROY()
+END_MESSAGE_MAP()
 
 RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
 {
@@ -143,19 +175,19 @@ RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
 		);
 
 	pSlider = new CSliderCtrl();
-	pSlider->Create(TBS_TOOLTIPS, sp_rect, this, ID_PSLIDER);
+	pSlider->Create(TBS_TOOLTIPS | WS_BORDER, sp_rect, this, ID_PSLIDER);
 	pSlider->SetRange(0, 50, TRUE);
 	pSlider->ShowWindow(SW_RESTORE);
 
 
 	eSlider = new CSliderCtrl();
-	eSlider->Create(TBS_TOOLTIPS, se_rect, this, ID_ESLIDER);
+	eSlider->Create(TBS_TOOLTIPS | WS_BORDER, se_rect, this, ID_ESLIDER);
 	eSlider->SetRange(0, 50, TRUE);
 	eSlider->ShowWindow(SW_RESTORE);
 
 	e = new CStatic();
 	CRect rp(
-		sp_rect.right+5,
+		sp_rect.right + 5,
 		sp_rect.top,
 		p_lbl.right,
 		sp_rect.bottom
@@ -175,4 +207,33 @@ RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
 	e = new CStatic();
 	e->Create(TEXT("<-- динамическое изменение эксцентриситета"), NULL, re, this);
 	e->ShowWindow(SW_RESTORE);
+}
+
+LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
+{
+	this->Create(
+		NULL, TEXT(""),
+		WS_BORDER | WS_CHILD,
+		rect,
+		pWnd
+		);
+	this->ShowWindow(SW_SHOW);
+
+	CRect rr;
+	this->GetClientRect(rr);
+	CRect r_lbl(
+		rr.left + 5,
+		(rr.bottom - rr.top)/11,
+		rr.right - 5,
+		rr.bottom - (rr.bottom - rr.top) / 11
+		);
+
+	InfoLabel = new CStatic();
+	InfoLabel->Create(TEXT("Общие сведения о кривой:\n\n"), WS_BORDER, r_lbl, this);
+	InfoLabel->ShowWindow(SW_RESTORE);
+}
+
+LeftBottomFrame::~LeftBottomFrame()
+{
+	delete InfoLabel;
 }
