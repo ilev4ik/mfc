@@ -99,32 +99,48 @@ void RightTopFrame::setBackground()
 	// создаём pen для рисования
 	// и загрузим рисунок к буферный контекст
 
-	CPen pen(PS_SOLID, 1, BLACK_PEN);
-	m_memDC.SelectObject(pen);
+	CPen pen_axes(PS_SOLID, 1, BLACK_PEN);
+	m_memDC.SelectObject(pen_axes);
 
-	// Рисуем координатные оси и отметки важные
-	// вертикально:
-	for (INT i = rect.left; i < rect.right; i += (rect.right - rect.left) / 8)
-	{
-		m_memDC.MoveTo(i, 0);
-		m_memDC.LineTo(i, rect.bottom);
-	}
+	// координатная ось
+	m_memDC.MoveTo(O.x, 0);
+	m_memDC.LineTo(O.x, rect.bottom);
+	m_memDC.MoveTo(0, O.y);
+	m_memDC.LineTo(rect.right, O.y);
 
-	for (INT j = rect.top; j < rect.bottom; j += (rect.bottom - rect.top) / 6)
-	{
-		m_memDC.MoveTo(0, j);
-		m_memDC.LineTo(rect.right, j);
-	}
 	// Нарисуем стрелки Y и X соответственно
 	m_memDC.MoveTo(O.x, 0);
 	m_memDC.LineTo(O.x - 5, rect.top + 10);
 	m_memDC.MoveTo(O.x, 0);
 	m_memDC.LineTo(O.x + 5, rect.top + 10);
-
+	
 	m_memDC.MoveTo(rect.right, O.y);
 	m_memDC.LineTo(rect.right - 10, O.y - 5);
 	m_memDC.MoveTo(rect.right, O.y);
 	m_memDC.LineTo(rect.right - 10, O.y + 5);
+
+	// сетка серого цвета:
+	CPen pen_grid(PS_SOLID, 1, RGB(180, 180, 180));
+	m_memDC.SelectObject(pen_grid);
+
+	// по Y
+	INT step = (rect.bottom - rect.top) / 8;
+	for (INT i = step; i <= rect.bottom; i += step)
+	{
+		m_memDC.MoveTo(0, O.y + i);	// вниз
+		m_memDC.LineTo(rect.right, O.y + i);
+		m_memDC.MoveTo(0, O.y - i);	// вверх
+		m_memDC.LineTo(rect.right, O.y - i);
+	}
+
+	// по X
+	for (INT j = step; j <= rect.right; j += step)
+	{
+		m_memDC.MoveTo(O.x + j, 0);	// вправо
+		m_memDC.LineTo(O.x + j, rect.bottom);
+		m_memDC.MoveTo(O.x - j, 0);	// влево
+		m_memDC.LineTo(O.x - j, rect.bottom);
+	}
 }
 
 afx_msg void RightTopFrame::OnPaint()

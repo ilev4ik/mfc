@@ -26,7 +26,7 @@ public:
 	friend class CMainWin;
 	RightTopFrame(CWnd*, CRect);
 	afx_msg void OnPaint();
-	void setBackground();
+	void setBackground();	// здесь делаем координатные оси
 private:
 
 	BOOL p_isdefined;
