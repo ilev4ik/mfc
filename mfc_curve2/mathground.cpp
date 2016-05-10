@@ -6,6 +6,8 @@
 #define DIM 3
 #define EPS 1e-4
 
+using namespace std;
+
 MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 {
 	a(1, 1) = EQ["x^2"];
@@ -162,30 +164,29 @@ void MathTool::setSubscribtion()
 	int CURVE_STATE = this->plot.CURVE_STATE;
 	if (CURVE_STATE == ELLIPS || CURVE_STATE == DOT)
 	{
-		plot.ca2 = -(1 / L2) * (Delta / D);
-		plot.cb2 = -(1 / L1) * (Delta / D);
-		plot.cp = plot.cb2 / std::sqrt(plot.ca2);
+		plot.ca = sqrt(-(1 / L2) * (Delta / D));
+		plot.cb = sqrt(-(1 / L1) * (Delta / D));
+		plot.cp = plot.cb*plot.cb / plot.ca;
 	}
 	else if (CURVE_STATE == HIPERBOLA || CURVE_STATE == INTERSECTING)
 	{
-		plot.ca2 = -1 / L1 * Delta / D;
-		plot.cb2 = 1 / L2 * Delta / D;
-		plot.cp = plot.cb2 / std::sqrt(plot.ca2);
+		plot.ca = sqrt(-1 / L1 * Delta / D);
+		plot.cb = sqrt(1 / L2 * Delta / D);
+		plot.cp = plot.cb*plot.cb / plot.ca;
 	}
 	else if (CURVE_STATE == PARABOLA)	
 	{
-		plot.cp = 1 / I*std::sqrt(-Delta / I);
+		plot.cp = 1 / I*sqrt(-Delta / I);
 	}
 	else if (CURVE_STATE == PARALLEL)
 	{
-		double aa = a(3, 3);
-		plot.ca2 = -a(3, 3)/a(1,1);
+		plot.ca = sqrt(-a(3, 3)/a(1,1));
 	}
 	else if (CURVE_STATE == COINCIDING)
 	{
-		plot.ca2 = 1/a(1,1);
+		plot.ca = sqrt(1/a(1,1));
 	}
-	else plot.ca2 = plot.cb2 = plot.cp = 0;			// потому что это мнимые случаи, а мы их 
+	else plot.ca = plot.cb = plot.cp = 0;			// потому что это мнимые случаи, а мы их 
 									// запихнули в ERROR, т.к. нет графика 
 									// в вещ. координатах
 }
@@ -195,21 +196,21 @@ void MathTool::setFDE()
 	switch (plot.CURVE_STATE)
 	{
 	case HIPERBOLA:
-		plot.focus.push_back(CPoint(std::sqrt(plot.ca2)/2, 0));
-		plot.focus.push_back(CPoint(std::sqrt(plot.cb2)/ 2, 0));
-		e = std::sqrt(plot.ca2 + plot.cb2) / std::sqrt(plot.ca2);
-		plot.dir.push_back(std::sqrt(plot.ca2) / e);
-		plot.dir.push_back(-std::sqrt(plot.ca2) / e);
-		plot.cp = plot.cb2 / std::sqrt(plot.ca2);
+		plot.focus.push_back(CPoint(plot.ca/2, 0));
+		plot.focus.push_back(CPoint(plot.cb/ 2, 0));
+		e = std::sqrt(plot.ca*plot.cb + plot.cb*plot.cb) / plot.ca;
+		plot.dir.push_back(plot.ca / e);
+		plot.dir.push_back(-plot.ca / e);
+		plot.cp = plot.cb*plot.cb / plot.ca;
 		break;
 	case PARABOLA:
 		plot.focus.push_back(CPoint(plot.cp / 2, 0));
-		e = std::sqrt(1 + plot.cb2 / plot.ca2);
+		e = std::sqrt(1 + (plot.cb*plot.cb) / (plot.ca*plot.ca));
 		plot.dir.push_back(-plot.cp / 2);
 		break;
 	case ELLIPS:
-		plot.cp = plot.cb2 / std::sqrt(plot.ca2);
-		e = std::sqrt(1 - plot.cb2 / plot.ca2);
+		plot.cp = plot.cb*plot.cb / plot.ca;
+		e = std::sqrt(1 - (plot.cb*plot.cb) / (plot.ca*plot.ca));
 		plot.dir.push_back(plot.cp / (e*(1 + e)));
 		plot.dir.push_back(-plot.cp / (e*(1 + e)));
 		plot.focus.push_back(CPoint(-plot.cp / (1 + e), 0));

@@ -72,6 +72,9 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	this->O.x = (rect.right - rect.left) / 2;
 	this->O.y = (rect.bottom - rect.top) / 2;
 
+	// ширина квадратной сетки
+	this->step = (rect.bottom - rect.top) / 8;	// 1 [step] = 1 [cm]
+
 	// Поддержка виртуального окна
 	// Получим размеры экрана
 	maxX = ::GetSystemMetrics(SM_CXSCREEN);
@@ -124,7 +127,6 @@ void RightTopFrame::setBackground()
 	m_memDC.SelectObject(pen_grid);
 
 	// по Y
-	INT step = (rect.bottom - rect.top) / 8;
 	for (INT i = step; i <= rect.bottom; i += step)
 	{
 		m_memDC.MoveTo(0, O.y + i);	// вниз
@@ -156,7 +158,6 @@ afx_msg void RightTopFrame::OnPaint()
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
-			paintDC.Ellipse(100,100,200,200);
 			break;
 		case PARABOLA:
 			break;

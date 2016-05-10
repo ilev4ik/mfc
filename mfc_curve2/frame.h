@@ -28,6 +28,7 @@ public:
 	afx_msg void OnPaint();
 	void setBackground();	// здесь делаем координатные оси
 private:
+	int step;
 
 	BOOL p_isdefined;
 	PlotFeatures pf;

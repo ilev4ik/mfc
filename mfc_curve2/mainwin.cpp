@@ -118,7 +118,8 @@ void CMainWin::setInfo_LB()
 
 	ss.str(std::string());
 	ss.clear();
-	ss << "Замена к каноническому виду: a^2=" << tool->plot.ca2 << ", b^2=" << tool->plot.cb2 << ", p=" <<tool->plot.cp << '\n';
+	ss << "Замена к каноническому виду: a^2=" << tool->plot.ca*tool->plot.ca << 
+		", b^2=" << tool->plot.cb*tool->plot.cb << ", p=" << tool->plot.cp << '\n';
 	ss << "Фокус(ы): ";
 	for (int i = 0; i < tool->plot.focus.size(); ++i)
 	{
