@@ -149,15 +149,22 @@ afx_msg void RightTopFrame::OnPaint()
 {
 	CPaintDC paintDC(this);
 
-	// копируем битмап в текущий контекст
+	// копируем битмап m_memDC в текущий контекст paintDC
 	// вместо трудоёмкой перерисовки каждый раз :)
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
+
+	// перо для фигур
+	CPen pen(PS_SOLID, 2, RGB(57,34,100));
+	m_memDC.SelectStockObject(NULL_BRUSH);
+	m_memDC.SelectObject(pen);
+
 
 	if (p_isdefined)
 	{
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
+			m_memDC.Ellipse(O.x - step*pf.ca, O.y - step*pf.cb, O.x + step*pf.ca, O.y + step*pf.cb);
 			break;
 		case PARABOLA:
 			break;
@@ -173,10 +180,12 @@ afx_msg void RightTopFrame::OnPaint()
 			return;
 		}
 	}
+
+	// обновляем с рисунком и точками
+	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 }
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
-	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
 END_MESSAGE_MAP()
 

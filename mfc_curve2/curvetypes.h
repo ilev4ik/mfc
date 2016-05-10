@@ -1,0 +1,15 @@
+#ifndef CURVE_TYPES
+#define CURVE_TYPES
+
+enum CurveType {
+	_ERROR,
+	ELLIPS,
+	HIPERBOLA,
+	PARABOLA,
+	DOT,
+	INTERSECTING,
+	PARALLEL,
+	COINCIDING
+};
+
+#endif
