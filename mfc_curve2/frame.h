@@ -2,7 +2,8 @@
 #define FRAMES
 
 #include <afxwin.h>
-#include <afxcmn.h>
+#include <afxcmn.h>	// CSliderCtrl
+#include "plot.h"	// info to plot :)
 
 class LeftTopFrame: public CFrameWnd
 {
@@ -15,6 +16,7 @@ private:
 	CStatic* EQLabel;
 
 	afx_msg void OnShift2();
+
 	DECLARE_MESSAGE_MAP()
 };
 
@@ -22,15 +24,21 @@ class RightTopFrame: public CFrameWnd
 {
 public:
 	friend class CMainWin;
-
 	RightTopFrame(CWnd*, CRect);
-	afx_msg BOOL OnEraseBkgnd(CDC*);
 	afx_msg void OnPaint();
+	void setBackground();
 private:
+
+	BOOL p_isdefined;
+	PlotFeatures pf;
+	CPoint O;
+	CRect rect;
+
 	CDC m_memDC;
 	CBitmap m_bmp;
-	CBrush m_bkbrush;
-	CRect rect;
+	int maxX, maxY;
+	COLORREF m_textColor;
+
 	DECLARE_MESSAGE_MAP()
 };
 

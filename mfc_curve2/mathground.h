@@ -4,6 +4,7 @@
 #include <map>
 #include <afxwin.h>
 #include <vector>
+#include "plot.h"
 
 class SquareMatrix
 {
@@ -40,10 +41,11 @@ public:
 	double Delta, D, I, B;		// Инварианты
 	CString clif;				// CLassIFication
 	CString canonical;			// канонический вид
-	double ca2, cb2, cp;		// coef a,b,p
-	std::vector <CPoint> focus;	// фокус(ы)
-	double e;					// экцентриситет и директриса
-	std::vector <double> dir;
+	double e;					// экцентриситет
+	
+	// Здесь всё, что надо для построения
+	// right top frame
+	PlotFeatures plot;
 
 	// right bottom frame
 	CString Y_exc;			// уравнение через экцентриситет
@@ -58,18 +60,6 @@ private:
 	void setFDE();
 	void setEqExcent();
 	void setPolar();
-
-	enum CurveType {
-		_ERROR,
-		ELLIPS,
-		HIPERBOLA,
-		PARABOLA,
-		DOT,
-		INTERSECTING,
-		PARALLEL,
-		COINCIDING
-	} CURVE_STATE = _ERROR;
-
 };
 
 #endif

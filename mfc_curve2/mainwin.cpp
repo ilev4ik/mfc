@@ -42,6 +42,7 @@ CMainWin::CMainWin()
 
 	this->frame_RB = new RightBottomFrame(this,
 		CRect(rect.Width() / 2, rect.Height() / 2, rect.Width(), rect.Height()));
+
 }
 
 afx_msg void CMainWin::OnCommand_SHOW_DIALOG()
@@ -58,6 +59,9 @@ END_MESSAGE_MAP()
 
 afx_msg void CMainWin::OnEnter()
 {
+	if (this->frame_LT->EQEditOld->GetWindowTextLengthW() == 0)
+		return;
+
 	std::map <CString, DOUBLE> eq_map;
 
 	CString EQ;
@@ -71,6 +75,11 @@ afx_msg void CMainWin::OnEnter()
 	this->setInfro_LT();
 	this->setInfo_LB();
 	this->setInfo_RB();
+
+	this->frame_RT->pf = this->tool->plot;
+	this->frame_RT->p_isdefined = TRUE;
+
+	this->frame_RT->InvalidateRect(NULL, FALSE);
 }
 
 CString operator+ (CString l, double r)
@@ -109,20 +118,20 @@ void CMainWin::setInfo_LB()
 
 	ss.str(std::string());
 	ss.clear();
-	ss << "Замена к каноническому виду: a^2=" << tool->ca2 << ", b^2=" << tool->cb2 << ", p=" <<tool->cp << '\n';
+	ss << "Замена к каноническому виду: a^2=" << tool->plot.ca2 << ", b^2=" << tool->plot.cb2 << ", p=" <<tool->plot.cp << '\n';
 	ss << "Фокус(ы): ";
-	for (int i = 0; i < tool->focus.size(); ++i)
+	for (int i = 0; i < tool->plot.focus.size(); ++i)
 	{
 		ss << "F_" << i + 1 << "=";
-		ss << tool->focus[i] << " ";
+		ss << tool->plot.focus[i] << " ";
 	}
 	ss << "\n";
 	ss << "Эксцентриситет: " << tool->e << '\n';
 	ss << "Директриса(ы):";
 
-	for (int i = 0; i < tool->dir.size(); ++i)
+	for (int i = 0; i < tool->plot.dir.size(); ++i)
 	{
-		ss << "x=" << tool->dir[i] << ", ";
+		ss << "x=" << tool->plot.dir[i] << ", ";
 	}
 	ss << "\n";
 	s = ss.str();

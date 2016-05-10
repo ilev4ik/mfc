@@ -1,5 +1,6 @@
 #include "frame.h"
 #include "res.h"
+#include "curvetypes.h"
 
 LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect) 
 {
@@ -37,6 +38,7 @@ LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect)
 
 BEGIN_MESSAGE_MAP(LeftTopFrame, CFrameWnd)
 	ON_COMMAND(ID_SHIFT2, LeftTopFrame::OnShift2)
+	ON_WM_PAINT()
 END_MESSAGE_MAP()
 
 afx_msg void LeftTopFrame::OnShift2()
@@ -46,83 +48,119 @@ afx_msg void LeftTopFrame::OnShift2()
 	this->EQEditOld->ReplaceSel(TEXT("^2"));
 }
 
-
 LeftTopFrame::~LeftTopFrame()
 {
 	delete EQEditOld;
 	delete EQLabel;
 }
 
-RightTopFrame::RightTopFrame(CWnd* pWnd, CRect rect)
+RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 {
+	p_isdefined = FALSE;
+
 	this->Create(
 		NULL, TEXT(""),
 		WS_BORDER | WS_CHILD,
-		rect,
+		r,
 		pWnd
 		);
 
 	// создаём контекст устройства (нашего текущего фрейма)
-	CClientDC dc(this);
 	this->GetClientRect(this->rect);
-	int maxX = rect.right - rect.left;
-	int maxY = rect.right - rect.left;
+
+	// центр координатной оси
+	this->O.x = (rect.right - rect.left) / 2;
+	this->O.y = (rect.bottom - rect.top) / 2;
+
+	// Поддержка виртуального окна
+	// Получим размеры экрана
+	maxX = ::GetSystemMetrics(SM_CXSCREEN);
+	maxY = ::GetSystemMetrics(SM_CYSCREEN);
+	CClientDC dc(this);
 
 	// Создание совместимого контекста устройства и
-	// битового образа для использования
-	// его в качестве буфера изображения
+	// битового образа
 
 	m_memDC.CreateCompatibleDC(&dc);
 	m_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
+	
 
+	// создаём битовый шаблон на устройстве для m_mbp
+	// придварительно создав, куда класть его
 	m_memDC.SelectObject(&m_bmp);
-	m_bkbrush.CreateStockObject(WHITE_BRUSH); // для стирания фона (белая кисть)
-	m_memDC.SelectObject(&m_bkbrush);
-
-	// копируем контекст устройства на битмап
 	m_memDC.PatBlt(0, 0, maxX, maxY, PATCOPY);
+	this->setBackground();
+
 	this->ShowWindow(SW_RESTORE);
-	this->UpdateWindow();	// signal to OnPaint
 }
 
-afx_msg BOOL RightTopFrame::OnEraseBkgnd(CDC* pDC)
+void RightTopFrame::setBackground()
 {
+	// создаём pen для рисования
+	// и загрузим рисунок к буферный контекст
+
 	CPen pen(PS_SOLID, 1, BLACK_PEN);
-	pDC->SelectObject(pen);
-	const DOUBLE XNUM = 6, YNUM = 4;
+	m_memDC.SelectObject(pen);
+
 	// Рисуем координатные оси и отметки важные
 	// вертикально:
-	for (
-		DOUBLE i = rect.left + (rect.right - rect.left) / XNUM;
-		i < rect.right; 
-		i += (rect.right - rect.left) / XNUM
-		)
+	for (INT i = rect.left; i < rect.right; i += (rect.right - rect.left) / 8)
 	{
-		pDC->MoveTo(i, 0);
-		pDC->LineTo(i, rect.bottom);
+		m_memDC.MoveTo(i, 0);
+		m_memDC.LineTo(i, rect.bottom);
 	}
 
-	for (
-		DOUBLE j = rect.top + (rect.bottom - rect.top) / YNUM;
-		j < rect.bottom;
-	j += (rect.bottom - rect.top) / YNUM
-		)
+	for (INT j = rect.top; j < rect.bottom; j += (rect.bottom - rect.top) / 6)
 	{
-		pDC->MoveTo(0, j);
-		pDC->LineTo(rect.right, j);
+		m_memDC.MoveTo(0, j);
+		m_memDC.LineTo(rect.right, j);
 	}
-	return TRUE;
+	// Нарисуем стрелки Y и X соответственно
+	m_memDC.MoveTo(O.x, 0);
+	m_memDC.LineTo(O.x - 5, rect.top + 10);
+	m_memDC.MoveTo(O.x, 0);
+	m_memDC.LineTo(O.x + 5, rect.top + 10);
+
+	m_memDC.MoveTo(rect.right, O.y);
+	m_memDC.LineTo(rect.right - 10, O.y - 5);
+	m_memDC.MoveTo(rect.right, O.y);
+	m_memDC.LineTo(rect.right - 10, O.y + 5);
 }
 
 afx_msg void RightTopFrame::OnPaint()
 {
+	CPaintDC paintDC(this);
 
+	// копируем битмап в текущий контекст
+	// вместо трудоёмкой перерисовки каждый раз :)
+	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
+
+	if (p_isdefined)
+	{
+		switch (pf.CURVE_STATE)	
+		{
+		case ELLIPS:
+			paintDC.Ellipse(100,100,200,200);
+			break;
+		case PARABOLA:
+			break;
+		case HIPERBOLA:
+			break;
+		case COINCIDING:
+			break;
+		case DOT:
+			break;
+		case PARALLEL:
+			break;
+		default:
+			return;
+		}
+	}
 }
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
-	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
