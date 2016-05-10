@@ -36,7 +36,11 @@ private:
 	CRect rect;
 
 	CDC m_memDC;
+	CDC m_picDC;
+
 	CBitmap m_bmp;
+	CBitmap p_bmp;
+	
 	int maxX, maxY;
 	COLORREF m_textColor;
 

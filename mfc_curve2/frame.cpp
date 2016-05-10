@@ -84,15 +84,20 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	// Создание совместимого контекста устройства и
 	// битового образа
 
-	m_memDC.CreateCompatibleDC(&dc);
+	m_memDC.CreateCompatibleDC(&dc);	// для фона
 	m_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
-	
 
-	// создаём битовый шаблон на устройстве для m_mbp
-	// придварительно создав, куда класть его
+	// создаём битовый шаблон на устройстве для m_mbp,
+	// предварительно создав, куда его класть.
 	m_memDC.SelectObject(&m_bmp);
 	m_memDC.PatBlt(0, 0, maxX, maxY, PATCOPY);
+
 	this->setBackground();
+
+	m_picDC.CreateCompatibleDC(&dc);	// для прибамбасов
+	p_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
+	m_picDC.SelectObject(&p_bmp);
+	m_picDC.PatBlt(0, 0, maxX, maxY, PATCOPY);
 
 	this->ShowWindow(SW_RESTORE);
 }
@@ -153,10 +158,11 @@ afx_msg void RightTopFrame::OnPaint()
 	// вместо трудоёмкой перерисовки каждый раз :)
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
+
 	// перо для фигур
 	CPen pen(PS_SOLID, 2, RGB(57,34,100));
-	m_memDC.SelectStockObject(NULL_BRUSH);
-	m_memDC.SelectObject(pen);
+	m_picDC.SelectStockObject(NULL_BRUSH);
+	m_picDC.SelectObject(pen);
 
 
 	if (p_isdefined)
@@ -164,7 +170,7 @@ afx_msg void RightTopFrame::OnPaint()
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
-			m_memDC.Ellipse(O.x - step*pf.ca, O.y - step*pf.cb, O.x + step*pf.ca, O.y + step*pf.cb);
+			m_picDC.Ellipse(O.x - step*pf.ca, O.y - step*pf.cb, O.x + step*pf.ca, O.y + step*pf.cb);
 			break;
 		case PARABOLA:
 			break;
@@ -182,7 +188,9 @@ afx_msg void RightTopFrame::OnPaint()
 	}
 
 	// обновляем с рисунком и точками
-	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
+	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
+	// очищаем буфер собственно графика и его features
+	m_picDC.FillSolidRect(0, 0, maxX, maxY, (RGB(255, 255, 255)));
 }
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
