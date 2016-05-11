@@ -122,6 +122,11 @@ void RightTopFrame::setBackground()
 	m_memDC.MoveTo(O.x, 0);
 	m_memDC.LineTo(O.x + 5, rect.top + 10);
 	
+	// подпишем ось Y
+	m_memDC.TextOutW(O.x + 8, rect.top, CString("y"));
+	// и ось X
+	m_memDC.TextOutW(rect.right - 10, O.y + 5, CString("x"));
+
 	m_memDC.MoveTo(rect.right, O.y);
 	m_memDC.LineTo(rect.right - 10, O.y - 5);
 	m_memDC.MoveTo(rect.right, O.y);
@@ -149,7 +154,6 @@ void RightTopFrame::setBackground()
 		m_memDC.LineTo(O.x - j, rect.bottom);
 	}
 }
-
 
 void RightTopFrame::plotCoinciding()
 {
@@ -206,6 +210,42 @@ void RightTopFrame::plotParallel()
 	m_picDC.LineTo((int)(O.x + step*pf.ca), rect.bottom);
 }
 
+void RightTopFrame::plotFeatures()
+{
+	CPen pen_focus(PS_SOLID, 2, RGB(255, 0, 0));
+	CPen pen_center(PS_SOLID, 2, RGB(0, 255, 0));
+	CPen pen_dir(PS_SOLID, 2, RGB(0, 0, 255));
+
+	m_picDC.SelectObject(pen_dir);
+
+	// директриса
+	for (INT i = 0; i < pf.dir.size(); ++i)
+	{
+		int a = pf.dir[i];
+		m_picDC.MoveTo((int)(O.x + step*this->pf.dir[i]), 0);
+		m_picDC.LineTo((int)(O.x + step*this->pf.dir[i]), rect.bottom);
+	}
+
+	m_picDC.SelectObject(pen_focus);
+
+	// фокусы
+	for (INT j = 0; j < pf.focus.size(); ++j)
+	{
+		m_picDC.Ellipse(
+			O.x+step*pf.focus[j].x - 4, O.y-step*pf.focus[j].y - 4,
+			O.x+step*pf.focus[j].x + 4, O.y-step*pf.focus[j].y + 4
+			);
+	}
+
+	m_picDC.SelectObject(pen_center);
+
+	if (pf.center != nullptr)
+		m_picDC.Ellipse(
+		(int)(step*pf.center->x + O.x) - 4, (int)(step*pf.center->y + O.y) - 4,
+		(int)(step*pf.center->x + O.x) + 4, (int)(step*pf.center->y + O.y) + 4
+		);
+}
+
 afx_msg void RightTopFrame::OnPaint()
 {
 	CPaintDC paintDC(this);
@@ -215,7 +255,7 @@ afx_msg void RightTopFrame::OnPaint()
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
 	// перо дл€ фигур
-	CPen pen(PS_SOLID, 2, RGB(57,34,100));
+	CPen pen(PS_SOLID, 2, RGB(0,0,0));
 	m_picDC.SelectStockObject(NULL_BRUSH);
 	m_picDC.SelectObject(pen);
 
@@ -242,13 +282,19 @@ afx_msg void RightTopFrame::OnPaint()
 		case PARALLEL:
 			this->plotParallel();
 			break;
+		case _ERROR:
+			MessageBox(TEXT("Ќи одной вещественной точки не определено!"),
+				TEXT("WARNING"), MB_ICONWARNING | MB_OK);
+			break;
 		default:
 			MessageBox(TEXT("”равнение кривой второго пор€дка введено неверно!"),
 				TEXT("WARNING"), MB_ICONWARNING | MB_OK);
-			m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255, 255, 255));
+			m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255,255,255));	// white
 			return;
 		}
 	}
+
+	this->plotFeatures();
 
 	// обновл€ем с рисунком и точками
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
@@ -358,9 +404,9 @@ LeftBottomFrame::LeftBottomFrame(CWnd* pWnd, CRect rect)
 	this->GetClientRect(rr);
 	CRect r_lbl(
 		rr.left + 5,
-		(rr.bottom - rr.top)/11,
+		(rr.bottom - rr.top)/15,
 		rr.right - 5,
-		rr.bottom - (rr.bottom - rr.top) / 11
+		rr.bottom - (rr.bottom - rr.top) / 15
 		);
 
 	InfoLabel = new CStatic();

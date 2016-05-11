@@ -36,6 +36,9 @@ private:
 	void plotParallel();
 	void plotCoinciding();
 
+	// всякие точки и директрисы
+	void plotFeatures();
+
 	int step;
 
 	BOOL p_isdefined;

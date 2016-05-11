@@ -89,7 +89,7 @@ CString operator+ (CString l, double r)
 	return str + l;
 }
 
-std::stringstream& operator<< (std::stringstream& ss, const CPoint& p)
+std::stringstream& operator<< (std::stringstream& ss, const Point& p)
 {
 	ss << "(" << p.x << "," << p.y << ")";
 	return ss;
@@ -135,6 +135,12 @@ void CMainWin::setInfo_LB()
 		ss << "x=" << tool->plot.dir[i] << ", ";
 	}
 	ss << "\n";
+
+	if (tool->plot.center != nullptr)
+	{
+		ss << "Центр кривой: ";
+		ss << *tool->plot.center << "\n";
+	}
 	s = ss.str();
 	c = s.c_str();
 	str += c;
