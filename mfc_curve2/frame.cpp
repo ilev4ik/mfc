@@ -179,18 +179,26 @@ afx_msg void RightTopFrame::OnPaint()
 		case COINCIDING:
 			break;
 		case DOT:
+			m_picDC.Ellipse(O.x - 3, O.y - 3, O.x + 3, O.y + 3);
 			break;
 		case PARALLEL:
+			m_picDC.MoveTo(O.x - step*pf.ca, 0);
+			m_picDC.LineTo(O.x - step*pf.ca, rect.bottom);
+			m_picDC.MoveTo(O.x + step*pf.ca, 0);
+			m_picDC.LineTo(O.x + step*pf.ca, rect.bottom);
 			break;
 		default:
+			MessageBox(TEXT("Уравнение кривой второго порядка введено неверно!"),
+				TEXT("WARNING"), MB_ICONWARNING | MB_OK);
+			m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255, 255, 255));
 			return;
 		}
 	}
 
 	// обновляем с рисунком и точками
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
-	// очищаем буфер собственно графика и его features
-	m_picDC.FillSolidRect(0, 0, maxX, maxY, (RGB(255, 255, 255)));
+	// очищаем буфер (белым) собственно графика и его features
+	m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255, 255, 255));
 }
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
