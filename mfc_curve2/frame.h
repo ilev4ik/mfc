@@ -27,7 +27,15 @@ public:
 	RightTopFrame(CWnd*, CRect);
 	afx_msg void OnPaint();
 	void setBackground();	// здесь делаем координатные оси
+	
 private:
+	void plotEllipse();
+	void plotHiperbola();
+	void plotParabola();
+	void plotDot();
+	void plotParallel();
+	void plotCoinciding();
+
 	int step;
 
 	BOOL p_isdefined;
