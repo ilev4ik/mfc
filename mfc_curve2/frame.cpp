@@ -158,7 +158,6 @@ afx_msg void RightTopFrame::OnPaint()
 	// вместо трудоЄмкой перерисовки каждый раз :)
 	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
-
 	// перо дл€ фигур
 	CPen pen(PS_SOLID, 2, RGB(57,34,100));
 	m_picDC.SelectStockObject(NULL_BRUSH);
@@ -173,12 +172,34 @@ afx_msg void RightTopFrame::OnPaint()
 			m_picDC.Ellipse(O.x - step*pf.ca, O.y - step*pf.cb, O.x + step*pf.ca, O.y + step*pf.cb);
 			break;
 		case PARABOLA:
+			if (pf.cp < 0)
+				pf.cp *= -1;	// т.к. существует поворот
+			for (DOUBLE x = O.x; x <= rect.right; ++x)
+			{
+				m_picDC.SetPixel(x, O.y - sqrt(2 * pf.cp*step*(x - O.x)), BLACK_PEN);	// верхн€€
+				m_picDC.SetPixel(x, O.y + sqrt(2 * pf.cp*step*(x - O.x)), BLACK_PEN);	// нижн€€
+			}
 			break;
 		case HIPERBOLA:
+			// мучалс€ 2 часа :)
+			for (DOUBLE x = O.x + pf.ca*step; x < rect.right; ++x)
+			{
+				m_picDC.SetPixel(x, ceil(O.y - step*pf.cb*sqrt((x - O.x)*(x - O.x) / (step*step*pf.ca*pf.ca) - 1)), BLACK_PEN);
+				m_picDC.SetPixel(x, ceil(O.y + step*pf.cb*sqrt((x - O.x)*(x - O.x) / (step*step*pf.ca*pf.ca) - 1)), BLACK_PEN);
+			}
+
+			for (DOUBLE x = O.x - pf.ca*step; x >= rect.left; --x)
+			{
+				m_picDC.SetPixel(x, ceil(O.y - step*pf.cb*sqrt((x - O.x)*(x - O.x) / (step*step*pf.ca*pf.ca) - 1)), BLACK_PEN);
+				m_picDC.SetPixel(x, ceil(O.y + step*pf.cb*sqrt((x - O.x)*(x - O.x) / (step*step*pf.ca*pf.ca) - 1)), BLACK_PEN);
+			}
 			break;
 		case COINCIDING:
+			m_picDC.MoveTo(O.x, 0);
+			m_picDC.LineTo(O.x, rect.bottom);
 			break;
 		case DOT:
+			// +- 3 чтобы было видно
 			m_picDC.Ellipse(O.x - 3, O.y - 3, O.x + 3, O.y + 3);
 			break;
 		case PARALLEL:
