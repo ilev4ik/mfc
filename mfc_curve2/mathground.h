@@ -60,6 +60,7 @@ private:
 	void setFDE();
 	void setEqExcent();
 	void setPolar();
+	void setCenter();
 };
 
 #endif

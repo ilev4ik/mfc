@@ -26,6 +26,7 @@ MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 	this->setFDE();
 	this->setEqExcent();
 	this->setPolar();
+	this->setCenter();
 }
 
 void MathTool::setInvariants()
@@ -91,7 +92,7 @@ void MathTool::setLambdas()
 
 void MathTool::setClassification()
 {
-	CurveType CURVE_STATE;
+	CurveType CURVE_STATE = _ERROR;
 	std::stringstream ss;
 	ss << "Кривая второго порядка типа: ";
 	if (Delta == 0)
@@ -196,25 +197,34 @@ void MathTool::setFDE()
 	switch (plot.CURVE_STATE)
 	{
 	case HIPERBOLA:
-		plot.focus.push_back(CPoint(plot.ca/2, 0));
-		plot.focus.push_back(CPoint(plot.cb/ 2, 0));
+		plot.focus.push_back(Point(-sqrt(plot.ca*plot.ca + plot.cb*plot.cb), 0));
+		plot.focus.push_back(Point(sqrt(plot.ca*plot.ca + plot.cb*plot.cb), 0));
 		e = std::sqrt(plot.ca*plot.cb + plot.cb*plot.cb) / plot.ca;
 		plot.dir.push_back(plot.ca / e);
 		plot.dir.push_back(-plot.ca / e);
 		plot.cp = plot.cb*plot.cb / plot.ca;
 		break;
 	case PARABOLA:
-		plot.focus.push_back(CPoint(plot.cp / 2, 0));
+		plot.focus.push_back(Point(plot.cp / 2, 0));
 		e = std::sqrt(1 + (plot.cb*plot.cb) / (plot.ca*plot.ca));
 		plot.dir.push_back(-plot.cp / 2);
 		break;
 	case ELLIPS:
 		plot.cp = plot.cb*plot.cb / plot.ca;
 		e = std::sqrt(1 - (plot.cb*plot.cb) / (plot.ca*plot.ca));
-		plot.dir.push_back(plot.cp / (e*(1 + e)));
-		plot.dir.push_back(-plot.cp / (e*(1 + e)));
-		plot.focus.push_back(CPoint(-plot.cp / (1 + e), 0));
-		plot.focus.push_back(CPoint(plot.cp / (1 + e), 0));
+		if (e != 0)
+		{
+			plot.dir.push_back(-plot.ca / e);
+			plot.dir.push_back(plot.ca / e);
+			plot.focus.push_back(Point(-plot.cp / (1 + e), 0));
+			plot.focus.push_back(Point(plot.cp / (1 + e), 0));
+		}
+		else
+		{
+			plot.dir.push_back(0);
+			plot.focus.push_back(Point(0, 0));
+		}
+
 		break;
 	}
 }
@@ -239,6 +249,15 @@ void MathTool::setPolar()
 
 	std::string str = ss.str();
 	this->polar = str.c_str();
+}
+
+void MathTool::setCenter()
+{
+	if (D != 0)
+		this->plot.center = new Point(
+				(a(1, 2)*a(2, 3) - a(1, 3)*a(2, 2)) / D, 
+				(a(1, 3)*a(1, 2) - a(1, 1)*a(2, 3)) / D
+				);
 }
 
 SquareMatrix::SquareMatrix()

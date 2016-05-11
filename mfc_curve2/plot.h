@@ -5,14 +5,21 @@
 #include <vector>
 #include <afxwin.h>
 
-// всЄ, что нужно дл€ построени€ !!! добавить дл€ пр€мых и точки!!!
+class Point
+{
+public:
+	Point(double, double);
+	double x;
+	double y;
+};
+
 struct PlotFeatures {
 	// инфа
 	PlotFeatures();
 	std::vector <double> dir;
-	double ca, cb, cp;		// coef a,b,p
-	std::vector <CPoint> focus;	// фокус(ы)
-
+	double ca, cb, cp;			// coef a,b,p
+	std::vector <Point> focus;	// фокус(ы)
+	Point* center;				// центр кривой
 	// тип кривой (ых)
 	CurveType CURVE_STATE;
 };
