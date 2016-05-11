@@ -20,6 +20,7 @@ struct PlotFeatures {
 	double ca, cb, cp;			// coef a,b,p
 	std::vector <Point> focus;	// фокус(ы)
 	Point* center;				// центр кривой
+	double k;					// коэф линейности
 	// тип кривой (ых)
 	CurveType CURVE_STATE;
 };

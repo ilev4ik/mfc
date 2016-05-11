@@ -26,6 +26,8 @@ public:
 	friend class CMainWin;
 	RightTopFrame(CWnd*, CRect);
 	afx_msg void OnPaint();
+	afx_msg void OnMouseMove(UINT, CPoint);
+
 	void setBackground();	// здесь делаем координатные оси
 	
 private:
@@ -35,6 +37,7 @@ private:
 	void plotDot();
 	void plotParallel();
 	void plotCoinciding();
+	void plotIntersecting();
 
 	// всякие точки и директрисы
 	void plotFeatures();

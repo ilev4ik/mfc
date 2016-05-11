@@ -169,7 +169,7 @@ void MathTool::setSubscribtion()
 		plot.cb = sqrt(-(1 / L1) * (Delta / D));
 		plot.cp = plot.cb*plot.cb / plot.ca;
 	}
-	else if (CURVE_STATE == HIPERBOLA || CURVE_STATE == INTERSECTING)
+	else if (CURVE_STATE == HIPERBOLA)
 	{
 		plot.ca = sqrt(-1 / L1 * Delta / D);
 		plot.cb = sqrt(1 / L2 * Delta / D);
@@ -186,6 +186,10 @@ void MathTool::setSubscribtion()
 	else if (CURVE_STATE == COINCIDING)
 	{
 		plot.ca = sqrt(1/a(1,1));
+	}
+	else if (CURVE_STATE == INTERSECTING)
+	{
+		plot.k = sqrt(-a(1,1)/a(2,2));
 	}
 	else plot.ca = plot.cb = plot.cp = 0;			// потому что это мнимые случаи, а мы их 
 									// запихнули в ERROR, т.к. нет графика 

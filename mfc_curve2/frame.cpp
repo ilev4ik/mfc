@@ -210,6 +210,16 @@ void RightTopFrame::plotParallel()
 	m_picDC.LineTo((int)(O.x + step*pf.ca), rect.bottom);
 }
 
+void RightTopFrame::plotIntersecting()
+{
+	int x1 = rect.left, x2 = rect.right;
+	m_picDC.MoveTo(x1, pf.k*(O.x-x1)+O.y);
+	m_picDC.LineTo(x2, pf.k*(O.x-x2) + O.y);
+
+	m_picDC.MoveTo(x1, -pf.k*(O.x - x1) + O.y);
+	m_picDC.LineTo(x2, -pf.k*(O.x - x2) + O.y);
+}
+
 void RightTopFrame::plotFeatures()
 {
 	CPen pen_focus(PS_SOLID, 2, RGB(255, 0, 0));
@@ -244,6 +254,25 @@ void RightTopFrame::plotFeatures()
 		(int)(step*pf.center->x + O.x) - 4, (int)(step*pf.center->y + O.y) - 4,
 		(int)(step*pf.center->x + O.x) + 4, (int)(step*pf.center->y + O.y) + 4
 		);
+}
+
+afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
+{
+	COLORREF color = GetPixel(m_memDC, pos.x, pos.y);
+
+	INT R = GetRValue(color), G = GetGValue(color), B = GetBValue(color);
+	if (R == 255 && G == 0 && B == 0)
+	{
+		int a = 1;
+	}
+	else if (G == 255 && R == 0 && B == 0)
+	{
+		int b = 2;
+	}
+	else if (B == 255 && G == 0 && R == 0)
+	{
+		int c = 3;
+	}
 }
 
 afx_msg void RightTopFrame::OnPaint()
@@ -282,6 +311,9 @@ afx_msg void RightTopFrame::OnPaint()
 		case PARALLEL:
 			this->plotParallel();
 			break;
+		case INTERSECTING:
+			this->plotIntersecting();
+			break;
 		case _ERROR:
 			MessageBox(TEXT("Ќи одной вещественной точки не определено!"),
 				TEXT("WARNING"), MB_ICONWARNING | MB_OK);
@@ -304,6 +336,7 @@ afx_msg void RightTopFrame::OnPaint()
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
 	ON_WM_PAINT()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
