@@ -258,7 +258,7 @@ void RightTopFrame::plotFeatures()
 
 afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 {
-	COLORREF color = GetPixel(m_memDC, pos.x, pos.y);
+	COLORREF color = GetPixel(m_picDC, pos.x, pos.y);
 
 	INT R = GetRValue(color), G = GetGValue(color), B = GetBValue(color);
 	if (R == 255 && G == 0 && B == 0)

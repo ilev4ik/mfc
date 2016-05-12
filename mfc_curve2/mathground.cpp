@@ -191,9 +191,7 @@ void MathTool::setSubscribtion()
 	{
 		plot.k = sqrt(-a(1,1)/a(2,2));
 	}
-	else plot.ca = plot.cb = plot.cp = 0;			// потому что это мнимые случаи, а мы их 
-									// запихнули в ERROR, т.к. нет графика 
-									// в вещ. координатах
+	else plot.ca = plot.cb = plot.cp = 0;
 }
 
 void MathTool::setFDE()
@@ -201,12 +199,12 @@ void MathTool::setFDE()
 	switch (plot.CURVE_STATE)
 	{
 	case HIPERBOLA:
-		plot.focus.push_back(Point(-sqrt(plot.ca*plot.ca + plot.cb*plot.cb), 0));
 		plot.focus.push_back(Point(sqrt(plot.ca*plot.ca + plot.cb*plot.cb), 0));
-		e = std::sqrt(plot.ca*plot.cb + plot.cb*plot.cb) / plot.ca;
+		plot.focus.push_back(Point(-sqrt(plot.ca*plot.ca + plot.cb*plot.cb), 0));
+		e = std::sqrt(plot.ca*plot.ca + plot.cb*plot.cb) / plot.ca;
 		plot.dir.push_back(plot.ca / e);
 		plot.dir.push_back(-plot.ca / e);
-		plot.cp = plot.cb*plot.cb / plot.ca;
+		plot.cp = plot.cb*plot.cb / e;
 		break;
 	case PARABOLA:
 		plot.focus.push_back(Point(plot.cp / 2, 0));
@@ -214,14 +212,14 @@ void MathTool::setFDE()
 		plot.dir.push_back(-plot.cp / 2);
 		break;
 	case ELLIPS:
-		plot.cp = plot.cb*plot.cb / plot.ca;
-		e = std::sqrt(1 - (plot.cb*plot.cb) / (plot.ca*plot.ca));
+		plot.cp = (plot.cb*plot.cb) / plot.ca;
+		e = sqrt(1 - (plot.cb*plot.cb) / (plot.ca*plot.ca));
 		if (e != 0)
 		{
 			plot.dir.push_back(-plot.ca / e);
 			plot.dir.push_back(plot.ca / e);
-			plot.focus.push_back(Point(-plot.cp / (1 + e), 0));
-			plot.focus.push_back(Point(plot.cp / (1 + e), 0));
+			plot.focus.push_back(Point(sqrt(plot.ca*plot.ca-plot.cb*plot.cb), 0));
+			plot.focus.push_back(Point(-sqrt(plot.ca*plot.ca - plot.cb*plot.cb), 0));
 		}
 		else
 		{
