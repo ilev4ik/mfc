@@ -6,6 +6,8 @@
 
 CApp App;
 
+void CApp::PreLoadState() {}
+
 BOOL CApp::InitInstance()
 {
 	m_pMainWnd = new CMainWin;
@@ -70,8 +72,8 @@ afx_msg void CMainWin::OnEnter()
 	// Конечный автомат для разбора строки
 	this->CurveEq = new FiniteAutomato(EQ);
 	CurveEq->START();
-	this->tool = new MathTool(CurveEq->eq_map);
 
+	this->tool = new MathTool(CurveEq->eq_map);
 	this->setInfro_LT();
 	this->setInfo_LB();
 	this->setInfo_RB();

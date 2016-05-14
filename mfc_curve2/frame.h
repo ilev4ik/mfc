@@ -3,6 +3,7 @@
 
 #include <afxwin.h>
 #include <afxcmn.h>	// CSliderCtrl
+#include <afxtooltipctrl.h>
 #include "plot.h"	// info to plot :)
 
 class LeftTopFrame: public CFrameWnd
@@ -27,10 +28,13 @@ public:
 	RightTopFrame(CWnd*, CRect);
 	afx_msg void OnPaint();
 	afx_msg void OnMouseMove(UINT, CPoint);
+	afx_msg void OnRButtonDown(UINT, CPoint);
 
 	void setBackground();	// здесь делаем координатные оси
-	
+	CPaintDC* pDC;
 private:
+	void clearGraphics();
+
 	void plotEllipse();
 	void plotHiperbola();
 	void plotParabola();
@@ -39,6 +43,15 @@ private:
 	void plotCoinciding();
 	void plotIntersecting();
 
+	void plotTangent();
+	void plotNormal();
+
+	// point for context menu (menu point)
+	CPoint mp;
+	// popup menu
+	HMENU hPopupMenu;
+
+	CStatic* tip;
 	// всякие точки и директрисы
 	void plotFeatures();
 
@@ -47,6 +60,7 @@ private:
 	BOOL p_isdefined;
 	PlotFeatures pf;
 	CPoint O;
+	CPoint extra;
 	CRect rect;
 
 	CDC m_memDC;

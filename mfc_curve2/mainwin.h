@@ -34,6 +34,7 @@ class CApp: public CWinApp
 {
 public:
 	BOOL InitInstance();
+	void PreLoadState();
 };
 
 #endif

@@ -6,16 +6,6 @@
 #include <vector>
 #include "plot.h"
 
-class SquareMatrix
-{
-public:
-	SquareMatrix();
-	~SquareMatrix();
-	double& operator() (int i, int j);
-private:
-	double** matrix;
-};
-
 // порядок важен! должен совпадать с enum CurveType в след. классе
 const std::string CanonicalView[] = {
 	"No real points determined",
@@ -33,8 +23,6 @@ class MathTool
 public:
 	MathTool(const std::map <CString, DOUBLE>);
 
-	SquareMatrix a;
-
 	// left bottom frame
 	CString F_xy;				// характеристическая форма
 	double L1, L2;				// Корни хар. ур-я
@@ -45,11 +33,13 @@ public:
 	
 	// Здесь всё, что надо для построения
 	// right top frame
+	// в том числе и сама матрица
 	PlotFeatures plot;
 
 	// right bottom frame
 	CString Y_exc;			// уравнение через экцентриситет
 	CString polar;			// в полярных координатах
+
 private:
 	void setInvariants();
 	void setQuadraticForm();

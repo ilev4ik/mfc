@@ -2,6 +2,8 @@
 #include "res.h"
 #include "curvetypes.h"
 
+
+
 LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect) 
 {
 	this->Create(
@@ -65,6 +67,11 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 		pWnd
 		);
 
+	//popup menu
+	hPopupMenu = CreatePopupMenu();
+	AppendMenu(hPopupMenu, MF_STRING, ID_TANGENT, TEXT("Касательная"));
+	AppendMenu(hPopupMenu, MF_STRING, ID_NORMAL, TEXT("Нормаль"));
+
 	// создаём контекст устройства (нашего текущего фрейма)
 	this->GetClientRect(this->rect);
 
@@ -79,6 +86,7 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	// Получим размеры экрана
 	maxX = ::GetSystemMetrics(SM_CXSCREEN);
 	maxY = ::GetSystemMetrics(SM_CYSCREEN);
+
 	CClientDC dc(this);
 
 	// Создание совместимого контекста устройства и
@@ -98,6 +106,11 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	p_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
 	m_picDC.SelectObject(&p_bmp);
 	m_picDC.PatBlt(0, 0, maxX, maxY, PATCOPY);
+
+	// popup
+	tip = new CStatic();
+	tip->Create(0, WS_BORDER, CRect(0, 0, step*3, step), this);
+	tip->ShowWindow(SW_RESTORE);
 
 	this->ShowWindow(SW_RESTORE);
 }
@@ -213,7 +226,7 @@ void RightTopFrame::plotParallel()
 void RightTopFrame::plotIntersecting()
 {
 	int x1 = rect.left, x2 = rect.right;
-	m_picDC.MoveTo(x1, pf.k*(O.x-x1)+O.y);
+	m_picDC.MoveTo(x1, pf.k*(O.x-x1) + O.y);
 	m_picDC.LineTo(x2, pf.k*(O.x-x2) + O.y);
 
 	m_picDC.MoveTo(x1, -pf.k*(O.x - x1) + O.y);
@@ -223,10 +236,15 @@ void RightTopFrame::plotIntersecting()
 void RightTopFrame::plotFeatures()
 {
 	CPen pen_focus(PS_SOLID, 2, RGB(255, 0, 0));
+	CBrush brush_focus, brush_center;
 	CPen pen_center(PS_SOLID, 2, RGB(0, 255, 0));
 	CPen pen_dir(PS_SOLID, 2, RGB(0, 0, 255));
 
+	brush_focus.CreateSolidBrush(RGB(255, 0, 0));
+	brush_center.CreateSolidBrush(RGB(0, 255, 0));
+
 	m_picDC.SelectObject(pen_dir);
+
 
 	// директриса
 	for (INT i = 0; i < pf.dir.size(); ++i)
@@ -237,7 +255,7 @@ void RightTopFrame::plotFeatures()
 	}
 
 	m_picDC.SelectObject(pen_focus);
-
+	m_picDC.SelectObject(brush_focus);
 	// фокусы
 	for (INT j = 0; j < pf.focus.size(); ++j)
 	{
@@ -248,7 +266,7 @@ void RightTopFrame::plotFeatures()
 	}
 
 	m_picDC.SelectObject(pen_center);
-
+	m_picDC.SelectObject(brush_center);
 	if (pf.center != nullptr)
 		m_picDC.Ellipse(
 		(int)(step*pf.center->x + O.x) - 4, (int)(step*pf.center->y + O.y) - 4,
@@ -256,32 +274,126 @@ void RightTopFrame::plotFeatures()
 		);
 }
 
+afx_msg void RightTopFrame::OnRButtonDown(UINT, CPoint p)
+{
+	extra = p;
+	ClientToScreen(&p);
+	TrackPopupMenuEx(hPopupMenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, p.x, p.y, this->m_hWnd, NULL);
+}
+
 afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 {
-	COLORREF color = GetPixel(m_picDC, pos.x, pos.y);
+	for (int i = 0; i < pf.focus.size(); ++i)
+	{
+		if (abs(pos.x - (O.x + step*pf.focus[i].x)) < 5 &&
+			abs(pos.y - (O.y + step*pf.focus[i].y)) < 5)
+		{
+			tip->SetWindowTextW(CString("Фокус"));
+			return;
+		}
+		else
+		{
+			tip->SetWindowTextW(TEXT(""));
+		}
+		tip->ShowWindow(SW_RESTORE);
+	}
 
-	INT R = GetRValue(color), G = GetGValue(color), B = GetBValue(color);
-	if (R == 255 && G == 0 && B == 0)
+	if (pf.center != nullptr)
 	{
-		int a = 1;
+		if (abs(O.x + step*pf.center->x - pos.x) < 5 &
+			abs(O.y + step*pf.center->y - pos.y < 5))
+		{
+			tip->SetWindowTextW(TEXT("Центр"));
+			return;
+		}
+		else
+		{
+			tip->SetWindowTextW(TEXT(""));
+		}
+		tip->ShowWindow(SW_RESTORE);
 	}
-	else if (G == 255 && R == 0 && B == 0)
+
+	for (int i = 0; i < pf.dir.size(); ++i)
 	{
-		int b = 2;
+		if (abs(pos.x - (O.x + step*pf.dir[i])) < 5)
+		{
+			tip->SetWindowTextW(TEXT("Директриса"));
+			return;
+		}
+		else
+		{
+			tip->SetWindowTextW(TEXT(""));
+		}
+		tip->ShowWindow(SW_RESTORE);
 	}
-	else if (B == 255 && G == 0 && R == 0)
+}
+
+void RightTopFrame::plotTangent()
+{
+	double x, y;
+	m_picDC.SelectStockObject(BLACK_PEN);
+
+	if (p_isdefined)
 	{
-		int c = 3;
+		if (extra.x > O.x) x = extra.x - O.x;
+		else x = extra.x - O.x;
+
+		y = O.y - extra.y;
+
+		this->pf.calcTangentInPoint(Point(x / step, y / step));
+		double b = pf.tc;
+		double k = pf.tk;
+
+		double x1 = rect.left, x2 = rect.right;
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
+		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
 	}
+	else MessageBox(TEXT("Кривая не определена!"),
+		TEXT("WARNING"), MB_ICONERROR | MB_OK);
+
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
+	this->clearGraphics();
+}
+
+void RightTopFrame::plotNormal()
+{
+	double x, y;
+	m_picDC.SelectStockObject(BLACK_PEN);
+
+	if (p_isdefined)
+	{
+		if (extra.x > O.x) x = extra.x - O.x;
+		else x = extra.x - O.x;
+
+		y = O.y - extra.y;
+
+		this->pf.calcNormalInPoint(Point(x / step, y / step));
+		double b = pf.nc;
+		double k = pf.nk;
+
+		double x1 = rect.left, x2 = rect.right;
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
+		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
+	}
+	else MessageBox(TEXT("Кривая не определена!"),
+		TEXT("WARNING"), MB_ICONERROR | MB_OK);
+
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
+	this->clearGraphics();
+}
+
+void RightTopFrame::clearGraphics()
+{
+	// очищаем буфер (белым) собственно графика и его features
+	m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255, 255, 255));
 }
 
 afx_msg void RightTopFrame::OnPaint()
 {
-	CPaintDC paintDC(this);
-
+	pDC = new CPaintDC(this);
 	// копируем битмап m_memDC в текущий контекст paintDC
 	// вместо трудоёмкой перерисовки каждый раз :)
-	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
 	// перо для фигур
 	CPen pen(PS_SOLID, 2, RGB(0,0,0));
@@ -329,14 +441,16 @@ afx_msg void RightTopFrame::OnPaint()
 	this->plotFeatures();
 
 	// обновляем с рисунком и точками
-	paintDC.BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
-	// очищаем буфер (белым) собственно графика и его features
-	m_picDC.FillSolidRect(0, 0, maxX, maxY, RGB(255, 255, 255));
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
+	this->clearGraphics();
 }
 
 BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
 	ON_WM_PAINT()
 	ON_WM_MOUSEMOVE()
+	ON_WM_RBUTTONDOWN()
+	ON_COMMAND(ID_TANGENT, RightTopFrame::plotTangent)
+	ON_COMMAND(ID_NORMAL, RightTopFrame::plotNormal)
 END_MESSAGE_MAP()
 
 RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
