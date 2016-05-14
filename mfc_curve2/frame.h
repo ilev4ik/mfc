@@ -29,6 +29,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnMouseMove(UINT, CPoint);
 	afx_msg void OnRButtonDown(UINT, CPoint);
+	afx_msg BOOL OnSetCursor(CWnd*, UINT, UINT);
 
 	void setBackground();	// здесь делаем координатные оси
 	CPaintDC* pDC;
@@ -45,6 +46,7 @@ private:
 
 	void plotTangent();
 	void plotNormal();
+	void plotDiameter();
 
 	// point for context menu (menu point)
 	CPoint mp;

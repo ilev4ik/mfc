@@ -26,11 +26,13 @@ public:
 	double k;					// коэф линейности
 	double tk, tc;				// для касательность k, c
 	double nk, nc;				// для нормали k, c
+	double dk, dc;				// для диаметра k, c
 
 	SquareMatrix a;
 
 	void calcTangentInPoint(Point);
 	void calcNormalInPoint(Point);
+	void calcDiameterInPoint(Point);
 	// тип кривой (ых)
 	CurveType CURVE_STATE;
 };

@@ -2,8 +2,6 @@
 #include "res.h"
 #include "curvetypes.h"
 
-
-
 LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect) 
 {
 	this->Create(
@@ -69,8 +67,9 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 
 	//popup menu
 	hPopupMenu = CreatePopupMenu();
-	AppendMenu(hPopupMenu, MF_STRING, ID_TANGENT, TEXT("Касательная"));
+	AppendMenu(hPopupMenu, MF_STRING, ID_TANGENT, TEXT("Касательная/поляра"));
 	AppendMenu(hPopupMenu, MF_STRING, ID_NORMAL, TEXT("Нормаль"));
+	AppendMenu(hPopupMenu, MF_STRING, ID_DIAMETER, TEXT("Диаметр"));
 
 	// создаём контекст устройства (нашего текущего фрейма)
 	this->GetClientRect(this->rect);
@@ -274,6 +273,37 @@ void RightTopFrame::plotFeatures()
 		);
 }
 
+BOOL RightTopFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{	
+	CPoint pos;
+	GetCursorPos(&pos);
+	ScreenToClient(&pos);
+
+	for (int i = 0; i < pf.focus.size(); ++i)
+	{
+		if (abs(pos.x - (O.x + step*pf.focus[i].x)) < 5 &&
+			abs(pos.y - (O.y + step*pf.focus[i].y)) < 5)
+		{
+			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_UPARROW));
+			return TRUE;
+		}
+		else ::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	}
+
+	if (pf.center != nullptr)
+	{
+		if (abs(O.x + step*pf.center->x - pos.x) < 5 &
+			abs(O.y + step*pf.center->y - pos.y < 5))
+		{
+			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_UPARROW));
+			return TRUE;
+		}
+		else ::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
+	}
+
+	return TRUE;
+}
+
 afx_msg void RightTopFrame::OnRButtonDown(UINT, CPoint p)
 {
 	extra = p;
@@ -335,9 +365,7 @@ void RightTopFrame::plotTangent()
 
 	if (p_isdefined)
 	{
-		if (extra.x > O.x) x = extra.x - O.x;
-		else x = extra.x - O.x;
-
+		x = extra.x - O.x;
 		y = O.y - extra.y;
 
 		this->pf.calcTangentInPoint(Point(x / step, y / step));
@@ -362,14 +390,37 @@ void RightTopFrame::plotNormal()
 
 	if (p_isdefined)
 	{
-		if (extra.x > O.x) x = extra.x - O.x;
-		else x = extra.x - O.x;
-
+		x = extra.x - O.x;
 		y = O.y - extra.y;
 
 		this->pf.calcNormalInPoint(Point(x / step, y / step));
 		double b = pf.nc;
 		double k = pf.nk;
+
+		double x1 = rect.left, x2 = rect.right;
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
+		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
+	}
+	else MessageBox(TEXT("Кривая не определена!"),
+		TEXT("WARNING"), MB_ICONERROR | MB_OK);
+
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
+	this->clearGraphics();
+}
+
+void RightTopFrame::plotDiameter()
+{
+	double x, y;
+	m_picDC.SelectStockObject(BLACK_PEN);
+
+	if (p_isdefined)
+	{
+		x = extra.x - O.x;
+		y = O.y - extra.y;
+
+		this->pf.calcDiameterInPoint(Point(x / step, y / step));
+		double b = pf.dc;
+		double k = pf.dk;
 
 		double x1 = rect.left, x2 = rect.right;
 		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
@@ -449,8 +500,10 @@ BEGIN_MESSAGE_MAP(RightTopFrame, CFrameWnd)
 	ON_WM_PAINT()
 	ON_WM_MOUSEMOVE()
 	ON_WM_RBUTTONDOWN()
+	ON_WM_SETCURSOR()
 	ON_COMMAND(ID_TANGENT, RightTopFrame::plotTangent)
 	ON_COMMAND(ID_NORMAL, RightTopFrame::plotNormal)
+	ON_COMMAND(ID_DIAMETER, RightTopFrame::plotDiameter)
 END_MESSAGE_MAP()
 
 RightBottomFrame::RightBottomFrame(CWnd* pWnd, CRect rect)
