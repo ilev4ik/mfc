@@ -47,7 +47,7 @@ private:
 	void setClassification();
 	void setCanonical();
 	void setSubscribtion();
-	void setFDE();
+	void setFDE();			// Focus, Directrisa, Excentrisa
 	void setEqExcent();
 	void setPolar();
 	void setCenter();

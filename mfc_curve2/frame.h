@@ -3,7 +3,6 @@
 
 #include <afxwin.h>
 #include <afxcmn.h>	// CSliderCtrl
-#include <afxtooltipctrl.h>
 #include "plot.h"	// info to plot :)
 
 class LeftTopFrame: public CFrameWnd
@@ -49,7 +48,7 @@ private:
 	void plotDiameter();
 
 	// point for context menu (menu point)
-	CPoint mp;
+	CPoint mp;	// точка в кординатах окна
 	// popup menu
 	HMENU hPopupMenu;
 
@@ -62,14 +61,14 @@ private:
 	BOOL p_isdefined;
 	PlotFeatures pf;
 	CPoint O;
-	CPoint extra;
+	CPoint extra;	// точка в координатах человеческих со смещение от O (см. выше)
 	CRect rect;
 
 	CDC m_memDC;
 	CDC m_picDC;
 
-	CBitmap m_bmp;
-	CBitmap p_bmp;
+	CBitmap m_bmp; // memory
+	CBitmap p_bmp; // picture
 	
 	int maxX, maxY;
 	COLORREF m_textColor;

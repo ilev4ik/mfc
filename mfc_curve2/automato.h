@@ -8,25 +8,27 @@ class FiniteAutomato
 {
 public:
 	FiniteAutomato(CString);
-	void START();
-	CString getResult();
-	void inRightOrder();
+	void START();			// начало разбора дл€ кон. автомата
+	CString getResult();	// дл€ вывода результата в CEdit
+	void inRightOrder();	// правильный пор€док + отбрасываем нулевые значени€
 
-	typedef std::map <CString, DOUBLE> comp_map;
-	comp_map eq_map;
+	typedef std::map <CString, DOUBLE> comp_map;	// переопредел€ем название типа
+	comp_map eq_map;								// объ€влем переменную определенного ранее типа
 private:
-	void Analise();
-	void toNormalForm();
+	void Analise();			// вызываетс€ непосредственно после START()
+	void toNormalForm();	// ?
 
+	// определение базовых лексем строки
 	enum STATE {
 		DIG,
 		VAR,
 		PM
-	} state;
+	} state; // состо€ние
 
-	CString var, coef;
-	CString EQ;
-	char ch, pm;
+	// текущие: 
+	CString var, coef;	// переменна€ и коэффициент
+	CString EQ;			// сама строка, подлежаща€ разбору
+	char ch, pm;		// текущий char (символ) и знак (+,-,=)
 };
 
 #endif

@@ -1,5 +1,5 @@
 #pragma once
-#include "res.h"
+#include "res.h"	// здесь определены ID-шники ресурсов
 #include <afxwin.h>
 
 // DotsDialog dialog

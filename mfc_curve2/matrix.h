@@ -1,6 +1,7 @@
 #ifndef MATRIX
 #define MATRIX
 
+// размерность dimension
 #define DIM 3
 
 class SquareMatrix

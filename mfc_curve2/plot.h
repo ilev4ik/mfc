@@ -14,6 +14,7 @@ public:
 	double y;
 };
 
+// структура для right top frame
 struct PlotFeatures {
 	// инфа
 public:
@@ -23,10 +24,11 @@ public:
 	double ca, cb, cp;			// coef a,b,p
 	std::vector <Point> focus;	// фокус(ы)
 	Point* center;				// центр кривой
-	double k;					// коэф линейности
-	double tk, tc;				// для касательность k, c
-	double nk, nc;				// для нормали k, c
-	double dk, dc;				// для диаметра k, c
+	double k;					// коэф линейности для пересекающихся прямых
+
+	double tk, tc;				// для касательность k, c (tangent)
+	double nk, nc;				// для нормали k, c (normal)
+	double dk, dc;				// для диаметра k, c (диаметр)
 
 	SquareMatrix a;
 
