@@ -35,7 +35,7 @@ public:
 private:
 	void clearGraphics();
 
-	void plotEllipse();
+	void plotEllipse(CPoint);
 	void plotHiperbola();
 	void plotParabola();
 	void plotDot();
@@ -60,7 +60,8 @@ private:
 
 	BOOL p_isdefined;
 	PlotFeatures pf;
-	CPoint O;
+	CPoint O;		// центр декартовых координат
+	CPoint Z;		// центр кривой второго порядка
 	CPoint extra;	// точка в координатах человеческих со смещение от O (см. выше)
 	CRect rect;
 

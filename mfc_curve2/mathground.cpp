@@ -171,8 +171,8 @@ void MathTool::setSubscribtion()
 	}
 	else if (CURVE_STATE == HIPERBOLA)
 	{
-		plot.ca = sqrt(-1 / L1 * Delta / D);
-		plot.cb = sqrt(1 / L2 * Delta / D);
+		plot.ca = sqrt(-(1 / L1) * (Delta / D));
+		plot.cb = sqrt((1 / L2) * (Delta / D));
 		plot.cp = plot.cb*plot.cb / plot.ca;
 	}
 	else if (CURVE_STATE == PARABOLA)	

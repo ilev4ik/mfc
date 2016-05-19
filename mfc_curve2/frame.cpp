@@ -179,11 +179,17 @@ void RightTopFrame::plotDot()
 	m_picDC.Ellipse(O.x - 3, O.y - 3, O.x + 3, O.y + 3);
 }
 
-void RightTopFrame::plotEllipse()
+void RightTopFrame::plotEllipse(CPoint C)
 {
+	int a = step*pf.ca, b = step*pf.cb;
+
+	if ((C == Z) && (pf.a(1,1) > pf.a(2,2)))
+		std::swap(a, b);
+
+	
 	m_picDC.Ellipse(
-		(int)(O.x - step*pf.ca), (int)(O.y - step*pf.cb), 
-		(int)(O.x + step*pf.ca), (int)(O.y + step*pf.cb)
+		(int)(C.x - a), (int)(C.y - b), 
+		(int)(C.x + a), (int)(C.y + b)
 		);
 }
 
@@ -232,47 +238,6 @@ void RightTopFrame::plotIntersecting()
 	m_picDC.LineTo(x2, -pf.k*(O.x - x2) + O.y);
 }
 
-void RightTopFrame::plotFeatures()
-{
-	CPen pen_focus(PS_SOLID, 2, RGB(255, 0, 0));
-	CBrush brush_focus, brush_center;
-	CPen pen_center(PS_SOLID, 2, RGB(0, 255, 0));
-	CPen pen_dir(PS_SOLID, 2, RGB(0, 0, 255));
-
-	brush_focus.CreateSolidBrush(RGB(255, 0, 0));
-	brush_center.CreateSolidBrush(RGB(0, 255, 0));
-
-	m_picDC.SelectObject(pen_dir);
-
-
-	// директриса
-	for (INT i = 0; i < pf.dir.size(); ++i)
-	{
-		int a = pf.dir[i];
-		m_picDC.MoveTo((int)(O.x + step*this->pf.dir[i]), 0);
-		m_picDC.LineTo((int)(O.x + step*this->pf.dir[i]), rect.bottom);
-	}
-
-	m_picDC.SelectObject(pen_focus);
-	m_picDC.SelectObject(brush_focus);
-	// фокусы
-	for (INT j = 0; j < pf.focus.size(); ++j)
-	{
-		m_picDC.Ellipse(
-			O.x+step*pf.focus[j].x - 4, O.y-step*pf.focus[j].y - 4,
-			O.x+step*pf.focus[j].x + 4, O.y-step*pf.focus[j].y + 4
-			);
-	}
-
-	m_picDC.SelectObject(pen_center);
-	m_picDC.SelectObject(brush_center);
-	if (pf.center != nullptr)
-		m_picDC.Ellipse(
-		(int)(step*pf.center->x + O.x) - 4, (int)(step*pf.center->y + O.y) - 4,
-		(int)(step*pf.center->x + O.x) + 4, (int)(step*pf.center->y + O.y) + 4
-		);
-}
-
 BOOL RightTopFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 {	
 	CPoint pos;
@@ -293,7 +258,7 @@ BOOL RightTopFrame::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	if (pf.center != nullptr)
 	{
 		if (abs(O.x + step*pf.center->x - pos.x) < 5 &
-			abs(O.y + step*pf.center->y - pos.y < 5))
+			abs(O.y - step*pf.center->y - pos.y) < 5)
 		{
 			::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_UPARROW));
 			return TRUE;
@@ -331,7 +296,7 @@ afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 	if (pf.center != nullptr)
 	{
 		if (abs(O.x + step*pf.center->x - pos.x) < 5 &
-			abs(O.y + step*pf.center->y - pos.y < 5))
+			abs(O.y + step*pf.center->y - pos.y) < 5)
 		{
 			tip->SetWindowTextW(TEXT("Центр"));
 			return;
@@ -373,8 +338,8 @@ void RightTopFrame::plotTangent()
 		double k = pf.tk;
 
 		double x1 = rect.left, x2 = rect.right;
-		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
-		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) + floor(O.y - step*b));
+		this->m_picDC.LineTo(x2, k*(O.x - x2) + floor(O.y - step*b));
 	}
 	else MessageBox(TEXT("Кривая не определена!"),
 		TEXT("WARNING"), MB_ICONERROR | MB_OK);
@@ -398,8 +363,8 @@ void RightTopFrame::plotNormal()
 		double k = pf.nk;
 
 		double x1 = rect.left, x2 = rect.right;
-		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
-		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) + (O.y - step*b));
+		this->m_picDC.LineTo(x2, k*(O.x - x2) + (O.y - step*b));
 	}
 	else MessageBox(TEXT("Кривая не определена!"),
 		TEXT("WARNING"), MB_ICONERROR | MB_OK);
@@ -423,14 +388,63 @@ void RightTopFrame::plotDiameter()
 		double k = pf.dk;
 
 		double x1 = rect.left, x2 = rect.right;
-		this->m_picDC.MoveTo(x1, k*(O.x - x1) - step*b + O.y);
-		this->m_picDC.LineTo(x2, k*(O.x - x2) - step*b + O.y);
+		this->m_picDC.MoveTo(x1, k*(O.x - x1) + (O.y - step*b));
+		this->m_picDC.LineTo(x2, k*(O.x - x2) + (O.y - step*b));
 	}
 	else MessageBox(TEXT("Кривая не определена!"),
 		TEXT("WARNING"), MB_ICONERROR | MB_OK);
 
 	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
 	this->clearGraphics();
+}
+
+void RightTopFrame::plotFeatures()
+{
+	CPen pen_focus(PS_SOLID, 2, RGB(255, 0, 0));
+	CBrush brush_focus, brush_center;
+	CPen pen_center(PS_SOLID, 2, RGB(0, 255, 0));
+	CPen pen_dir(PS_SOLID, 2, RGB(0, 0, 255));
+
+	brush_focus.CreateSolidBrush(RGB(255, 0, 0));
+	brush_center.CreateSolidBrush(RGB(0, 255, 0));
+
+	m_picDC.SelectObject(pen_dir);
+
+
+	// директриса
+	for (INT i = 0; i < pf.dir.size(); ++i)
+	{
+		int a = pf.dir[i];
+		m_picDC.MoveTo((int)(O.x + step*this->pf.dir[i]), 0);
+		m_picDC.LineTo((int)(O.x + step*this->pf.dir[i]), rect.bottom);
+	}
+
+	m_picDC.SelectObject(pen_focus);
+	m_picDC.SelectObject(brush_focus);
+
+	// фокусы
+	for (INT j = 0; j < pf.focus.size(); ++j)
+	{
+		m_picDC.Ellipse(
+			O.x + step*pf.focus[j].x - 4, O.y - step*pf.focus[j].y - 4,
+			O.x + step*pf.focus[j].x + 4, O.y - step*pf.focus[j].y + 4
+			);
+	}
+
+	// центр
+	m_picDC.SelectObject(pen_center);
+	m_picDC.SelectObject(brush_center);
+
+	if (pf.center != nullptr)
+	{
+		this->Z.x = (int)(step*pf.center->x + O.x);
+		this->Z.y = (int)(O.y - step*pf.center->y);
+
+		m_picDC.Ellipse(
+			Z.x - 4, Z.y - 4,
+			Z.x + 4, Z.y + 4
+			);
+	}
 }
 
 void RightTopFrame::clearGraphics()
@@ -448,16 +462,22 @@ afx_msg void RightTopFrame::OnPaint()
 
 	// перо для фигур
 	CPen pen(PS_SOLID, 2, RGB(0,0,0));
-	m_picDC.SelectStockObject(NULL_BRUSH);
-	m_picDC.SelectObject(pen);
-
+	CPen dpen(PS_DOT, 1, RGB(0,0,0));
 
 	if (p_isdefined)
 	{
+		// сперва вызываем это обязательно
+		this->plotFeatures();
+
+		// меняем инструменты
+		m_picDC.SelectStockObject(NULL_BRUSH);
+		m_picDC.SelectObject(dpen);
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
-			this->plotEllipse();
+			this->plotEllipse(O);	// канон
+			m_picDC.SelectObject(pen);
+			this->plotEllipse(Z);	// декарт
 			break;
 		case PARABOLA:
 			this->plotParabola();
@@ -488,8 +508,6 @@ afx_msg void RightTopFrame::OnPaint()
 			return;
 		}
 	}
-
-	this->plotFeatures();
 
 	// обновляем с рисунком и точками
 	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCAND);
