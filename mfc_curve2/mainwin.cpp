@@ -130,7 +130,7 @@ void CMainWin::setInfo_LB()
 	}
 	ss << "\n";
 	ss << "Эксцентриситет: " << tool->e << '\n';
-	ss << "Директриса(ы):";
+	ss << "Директриса(ы): ";
 
 	for (int i = 0; i < tool->plot.dir.size(); ++i)
 	{

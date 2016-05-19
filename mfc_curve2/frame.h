@@ -47,6 +47,11 @@ private:
 	void plotNormal();
 	void plotDiameter();
 
+
+	// graphics transformation functions
+	HBITMAP RotateGraphicsBitmap(HBITMAP, float, COLORREF);
+	void CopyBitmap(HBITMAP, CBitmap*);
+
 	// point for context menu (menu point)
 	CPoint mp;	// точка в кординатах окна
 	// popup menu
@@ -73,6 +78,9 @@ private:
 	
 	int maxX, maxY;
 	COLORREF m_textColor;
+
+	int GetCBitmapWidth(const CBitmap &);
+	int GetCBitmapHeight(const CBitmap &);
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -54,6 +54,7 @@ LeftTopFrame::~LeftTopFrame()
 	delete EQLabel;
 }
 
+// height and width of bitmaps
 RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 {
 	p_isdefined = FALSE;
@@ -112,6 +113,20 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	tip->ShowWindow(SW_RESTORE);
 
 	this->ShowWindow(SW_RESTORE);
+}
+
+int RightTopFrame::GetCBitmapWidth(const CBitmap & cbm)
+{
+	BITMAP bm;
+	cbm.GetObject(sizeof(BITMAP), &bm);
+	return bm.bmWidth;
+}
+
+int RightTopFrame::GetCBitmapHeight(const CBitmap & cbm)
+{
+	BITMAP bm;
+	cbm.GetObject(sizeof(BITMAP), &bm);
+	return bm.bmHeight;
 }
 
 void RightTopFrame::setBackground()
@@ -447,6 +462,95 @@ void RightTopFrame::plotFeatures()
 	}
 }
 
+void RightTopFrame::CopyBitmap(HBITMAP hBmp, CBitmap *oBmp)
+{
+	CBitmap *srcBmp;
+	srcBmp = CBitmap::FromHandle(hBmp);
+
+	BITMAP bmpInfo;
+	srcBmp->GetBitmap(&bmpInfo);
+
+	CDC srcDC;
+	srcDC.CreateCompatibleDC(NULL);
+
+	CBitmap *pOldBmp1 = srcDC.SelectObject(srcBmp);
+	oBmp->CreateCompatibleBitmap(&srcDC, bmpInfo.bmWidth, bmpInfo.bmHeight);
+
+	CDC m_picDC;
+	m_picDC.CreateCompatibleDC(NULL);
+
+	CBitmap *pOldBmp2 = m_picDC.SelectObject(oBmp);
+	m_picDC.BitBlt(0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, &srcDC, 0, 0, SRCCOPY);
+
+	srcDC.SelectObject(pOldBmp1);
+	m_picDC.SelectObject(pOldBmp2);
+}
+
+HBITMAP RightTopFrame::RotateGraphicsBitmap(HBITMAP hBitmap, float radians, COLORREF clrBack)
+{
+	// Create a memory DC compatible with the display
+	CDC sourceDC, destDC;
+	sourceDC.CreateCompatibleDC(NULL);
+	destDC.CreateCompatibleDC(NULL);
+
+	// Get logical coordinates
+	BITMAP bm;
+	::GetObject(hBitmap, sizeof(bm), &bm);
+
+	float _cos = (float)cos(radians);
+	float _sin = (float)sin(radians);
+
+	// Compute dimensions of the resulting bitmap
+	// First get the coordinates of the 3 corners other than origin
+	int x1 = (int)(bm.bmHeight * _sin);
+	int y1 = (int)(bm.bmHeight * _cos);
+	int x2 = (int)(bm.bmWidth * _cos + bm.bmHeight * _sin);
+	int y2 = (int)(bm.bmHeight * _cos - bm.bmWidth * _sin);
+	int x3 = (int)(bm.bmWidth * _cos);
+	int y3 = (int)(-bm.bmWidth * _sin);
+
+	int minx = min(0, min(x1, min(x2, x3)));
+	int miny = min(0, min(y1, min(y2, y3)));
+	int maxx = max(0, max(x1, max(x2, x3)));
+	int maxy = max(0, max(y1, max(y2, y3)));
+
+	int w = maxx - minx;
+	int h = maxy - miny;
+
+	// Create a bitmap to hold the result
+	HBITMAP hbmResult = ::CreateCompatibleBitmap(CClientDC(NULL), w, h);
+
+	HBITMAP hbmOldSource = (HBITMAP)::SelectObject(sourceDC.m_hDC, hBitmap);
+	HBITMAP hbmOldDest = (HBITMAP)::SelectObject(destDC.m_hDC, hbmResult);
+
+	// Draw the background color before we change mapping mode
+	HBRUSH hbrBack = CreateSolidBrush(clrBack);
+	HBRUSH hbrOld = (HBRUSH)::SelectObject(destDC.m_hDC, hbrBack);
+	destDC.PatBlt(0, 0, w, h, PATCOPY);
+	::DeleteObject(::SelectObject(destDC.m_hDC, hbrOld));
+
+	// We will use world transform to rotate the bitmap
+	SetGraphicsMode(destDC.m_hDC, GM_ADVANCED);
+	XFORM xform;
+	xform.eM11 = _cos;
+	xform.eM12 = -_sin;
+	xform.eM21 = _sin;
+	xform.eM22 = _cos;
+	xform.eDx = (float)(-minx);
+	xform.eDy = (float)(-miny);
+
+	SetWorldTransform(destDC.m_hDC, &xform);
+
+	// Now do the actual rotating - a pixel at a time
+	destDC.BitBlt(0, 0, bm.bmWidth, bm.bmHeight, &sourceDC, 0, 0, SRCCOPY);
+
+	// Restore DCs
+	::SelectObject(sourceDC.m_hDC, hbmOldSource);
+	::SelectObject(destDC.m_hDC, hbmOldDest);
+
+	return hbmResult;
+}
+
 void RightTopFrame::clearGraphics()
 {
 	// очищаем буфер (белым) собственно графика и его features
@@ -475,10 +579,12 @@ afx_msg void RightTopFrame::OnPaint()
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
+		{
 			this->plotEllipse(O);	// канон
 			m_picDC.SelectObject(pen);
 			this->plotEllipse(Z);	// декарт
 			break;
+		}
 		case PARABOLA:
 			this->plotParabola();
 			break;

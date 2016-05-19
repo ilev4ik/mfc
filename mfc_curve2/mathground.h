@@ -51,6 +51,8 @@ private:
 	void setEqExcent();
 	void setPolar();
 	void setCenter();
+
+	int det(int, double mat[5][5]);	// определитель
 };
 
 #endif
