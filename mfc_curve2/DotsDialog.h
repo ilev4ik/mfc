@@ -11,6 +11,7 @@ public:
 	DotsDialog(CWnd* pParent = NULL);   // standard constructor
 	virtual ~DotsDialog();
 
+	afx_msg void OnPaint();
 // Dialog Data
 	enum type {IDD = IDD_OLE_PROPPAGE_SMALL};
 	enum r_button {CANCEL, ACCEPT};
@@ -22,4 +23,11 @@ protected:
 public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedAccept();
+private:
+	void DotsDialog::setBackground();
+	CBitmap m_bmp;
+	CDC DC;
+	CPoint O;
+	CRect rect;
+	int step;
 };

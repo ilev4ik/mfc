@@ -1,5 +1,5 @@
 #include "mathground.h"
-#include <sstream>
+#include <sstream> // for stringstream
 #include <iomanip>
 #include "curvetypes.h"
 
@@ -16,7 +16,6 @@ MathTool::MathTool(std::map <CString, DOUBLE> EQ)
 	plot.a(1, 3) = plot.a(3, 1) = EQ["x"]/2;
 	plot.a(2, 3) = plot.a(3, 2) = EQ["y"]/2;
 
-	double as = plot.a(2, 3);
 	this->setInvariants();
 	this->setQuadraticForm();
 	this->setLambdas();

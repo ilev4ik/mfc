@@ -1,3 +1,7 @@
+// ѕор€док не мен€ть!!!
+#define _USE_MATH_DEFINES
+
+#include <math.h>
 #include "frame.h"
 #include "res.h"
 #include "curvetypes.h"
@@ -462,52 +466,35 @@ void RightTopFrame::plotFeatures()
 	}
 }
 
-void RightTopFrame::CopyBitmap(HBITMAP hBmp, CBitmap *oBmp)
-{
-	CBitmap *srcBmp;
-	srcBmp = CBitmap::FromHandle(hBmp);
-
-	BITMAP bmpInfo;
-	srcBmp->GetBitmap(&bmpInfo);
-
-	CDC srcDC;
-	srcDC.CreateCompatibleDC(NULL);
-
-	CBitmap *pOldBmp1 = srcDC.SelectObject(srcBmp);
-	oBmp->CreateCompatibleBitmap(&srcDC, bmpInfo.bmWidth, bmpInfo.bmHeight);
-
-	CDC m_picDC;
-	m_picDC.CreateCompatibleDC(NULL);
-
-	CBitmap *pOldBmp2 = m_picDC.SelectObject(oBmp);
-	m_picDC.BitBlt(0, 0, bmpInfo.bmWidth, bmpInfo.bmHeight, &srcDC, 0, 0, SRCCOPY);
-
-	srcDC.SelectObject(pOldBmp1);
-	m_picDC.SelectObject(pOldBmp2);
-}
-
-HBITMAP RightTopFrame::RotateGraphicsBitmap(HBITMAP hBitmap, float radians, COLORREF clrBack)
+// GetRotatedBitmapNT	- Create a new bitmap with rotated image
+// Returns		- Returns new bitmap with rotated image
+// hBitmap		- Bitmap to rotate
+// radians		- Angle of rotation in radians
+// clrBack		- Color of pixels in the resulting bitmap that do
+//			  not get covered by source pixels
+void RightTopFrame::GetRotatedBitmapNT(HBITMAP hBitmap, float radians, COLORREF clrBack)
 {
 	// Create a memory DC compatible with the display
-	CDC sourceDC, destDC;
+	CDC sourceDC;
 	sourceDC.CreateCompatibleDC(NULL);
-	destDC.CreateCompatibleDC(NULL);
 
 	// Get logical coordinates
 	BITMAP bm;
 	::GetObject(hBitmap, sizeof(bm), &bm);
 
-	float _cos = (float)cos(radians);
-	float _sin = (float)sin(radians);
-
+	float cosine = (float)cos(radians);
+	float sine = (float)sin(radians);
+	
 	// Compute dimensions of the resulting bitmap
 	// First get the coordinates of the 3 corners other than origin
-	int x1 = (int)(bm.bmHeight * _sin);
-	int y1 = (int)(bm.bmHeight * _cos);
-	int x2 = (int)(bm.bmWidth * _cos + bm.bmHeight * _sin);
-	int y2 = (int)(bm.bmHeight * _cos - bm.bmWidth * _sin);
-	int x3 = (int)(bm.bmWidth * _cos);
-	int y3 = (int)(-bm.bmWidth * _sin);
+	//ClientToScreen(&Z);
+
+	int x1 = (int)((bm.bmHeight-Z.y) * sine);
+	int y1 = (int)((bm.bmHeight-Z.y) * cosine);
+	int x2 = (int)((bm.bmWidth-Z.x) * cosine + (bm.bmHeight-Z.y) * sine);
+	int y2 = (int)((bm.bmHeight-Z.y) * cosine - (bm.bmWidth-Z.x) * sine);
+	int x3 = 0;
+	int y3 = 0;
 
 	int minx = min(0, min(x1, min(x2, x3)));
 	int miny = min(0, min(y1, min(y2, y3)));
@@ -519,36 +506,34 @@ HBITMAP RightTopFrame::RotateGraphicsBitmap(HBITMAP hBitmap, float radians, COLO
 
 	// Create a bitmap to hold the result
 	HBITMAP hbmResult = ::CreateCompatibleBitmap(CClientDC(NULL), w, h);
-
+	
 	HBITMAP hbmOldSource = (HBITMAP)::SelectObject(sourceDC.m_hDC, hBitmap);
-	HBITMAP hbmOldDest = (HBITMAP)::SelectObject(destDC.m_hDC, hbmResult);
+	HBITMAP hbmOldDest = (HBITMAP)::SelectObject(m_picDC.m_hDC, hbmResult);
 
 	// Draw the background color before we change mapping mode
 	HBRUSH hbrBack = CreateSolidBrush(clrBack);
-	HBRUSH hbrOld = (HBRUSH)::SelectObject(destDC.m_hDC, hbrBack);
-	destDC.PatBlt(0, 0, w, h, PATCOPY);
-	::DeleteObject(::SelectObject(destDC.m_hDC, hbrOld));
+	HBRUSH hbrOld = (HBRUSH)::SelectObject(m_picDC.m_hDC, hbrBack);
+	m_picDC.PatBlt(0, 0, w, h, PATCOPY);
+	::DeleteObject(::SelectObject(m_picDC.m_hDC, hbrOld));
 
 	// We will use world transform to rotate the bitmap
-	SetGraphicsMode(destDC.m_hDC, GM_ADVANCED);
+	SetGraphicsMode(m_picDC.m_hDC, GM_ADVANCED);
 	XFORM xform;
-	xform.eM11 = _cos;
-	xform.eM12 = -_sin;
-	xform.eM21 = _sin;
-	xform.eM22 = _cos;
-	xform.eDx = (float)(-minx);
-	xform.eDy = (float)(-miny);
+	xform.eM11 = cosine;
+	xform.eM12 = -sine;
+	xform.eM21 = sine;
+	xform.eM22 = cosine;
+	xform.eDx = (float)-minx;
+	xform.eDy = (float)-miny;
 
-	SetWorldTransform(destDC.m_hDC, &xform);
+	BOOL flag = SetWorldTransform(m_picDC.m_hDC, &xform);
 
 	// Now do the actual rotating - a pixel at a time
-	destDC.BitBlt(0, 0, bm.bmWidth, bm.bmHeight, &sourceDC, 0, 0, SRCCOPY);
-
+	//m_picDC.BitBlt(0, 0, bm.bmWidth, bm.bmHeight, &sourceDC, 0, 0, SRCAND);
+	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_picDC, 0, 0, SRCCOPY);
 	// Restore DCs
 	::SelectObject(sourceDC.m_hDC, hbmOldSource);
-	::SelectObject(destDC.m_hDC, hbmOldDest);
-
-	return hbmResult;
+	::SelectObject(m_picDC.m_hDC, hbmOldDest);
 }
 
 void RightTopFrame::clearGraphics()
@@ -565,7 +550,7 @@ afx_msg void RightTopFrame::OnPaint()
 	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
 	// перо дл€ фигур
-	CPen pen(PS_SOLID, 2, RGB(0,0,0));
+	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
 	CPen dpen(PS_DOT, 1, RGB(0,0,0));
 
 	if (p_isdefined)
@@ -583,6 +568,7 @@ afx_msg void RightTopFrame::OnPaint()
 			this->plotEllipse(O);	// канон
 			m_picDC.SelectObject(pen);
 			this->plotEllipse(Z);	// декарт
+			//this->GetRotatedBitmapNT((HBITMAP)p_bmp.m_hObject, M_PI/2, RGB(255, 255, 255));
 			break;
 		}
 		case PARABOLA:

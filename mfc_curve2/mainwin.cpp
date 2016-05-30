@@ -10,7 +10,7 @@ void CApp::PreLoadState() {}
 
 BOOL CApp::InitInstance()
 {
-	m_pMainWnd = new CMainWin;
+	this->m_pMainWnd = new CMainWin;
 	m_pMainWnd->ShowWindow(SW_RESTORE);
 	m_pMainWnd->UpdateWindow();
 	
@@ -24,9 +24,6 @@ CMainWin::CMainWin()
 					| WS_BORDER);
 	this->m_wndMenu.LoadMenu(IDR_MENU1);	// Загрузить меню из файла ресурса
 	SetMenu(&m_wndMenu);					// Установить меню
-
-	CRect mainRect;
-	this->GetClientRect(mainRect);
 
 	CRect rect;
 	GetClientRect(rect);
@@ -102,7 +99,7 @@ void CMainWin::setInfo_LB()
 	std::stringstream ss;
 
 	CString str("Общие сведения о кривой:\n");
-	str += TEXT("Характеристическая форма: ") + tool->F_xy + TEXT('\n');
+	str += TEXT("Характеристическая форма: ") + tool->F_xy + TEXT('\n'); // TEXT -- макрос конертирует в CString
 
 	ss << std::fixed << std::setprecision(2);
 	ss << "Корни характеристического уравнения: L1=" << tool->L1 

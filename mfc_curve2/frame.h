@@ -49,8 +49,7 @@ private:
 
 
 	// graphics transformation functions
-	HBITMAP RotateGraphicsBitmap(HBITMAP, float, COLORREF);
-	void CopyBitmap(HBITMAP, CBitmap*);
+	void GetRotatedBitmapNT(HBITMAP, float, COLORREF);
 
 	// point for context menu (menu point)
 	CPoint mp;	// точка в кординатах окна
@@ -75,7 +74,7 @@ private:
 
 	CBitmap m_bmp; // memory
 	CBitmap p_bmp; // picture
-	
+
 	int maxX, maxY;
 	COLORREF m_textColor;
 

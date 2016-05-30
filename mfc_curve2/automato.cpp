@@ -1,7 +1,7 @@
 #include "automato.h"
 #include <sstream>
 
-FiniteAutomato::FiniteAutomato(CString str) : EQ(str), var("c") 
+FiniteAutomato::FiniteAutomato(CString str): EQ(str), var("c") 
 {
 	ch = str[0]; 
 	pm = '+';
@@ -13,7 +13,7 @@ FiniteAutomato::FiniteAutomato(CString str) : EQ(str), var("c")
 void FiniteAutomato::toNormalForm()
 {
 	int N = this->EQ.GetLength();
-	if (N == 1) return;
+	if (N <= 2) return;
 
 	if (EQ[N - 2] == '=' && EQ[N - 1] == '0')
 		return;
@@ -27,16 +27,19 @@ void FiniteAutomato::toNormalForm()
 		step = 0;
 	}
 
+
+	// yourself
 	EQ.Replace(TEXT("="), ispos? TEXT("-"): TEXT(""));
 	for (int i = eq_idx+step; i < N-1; ++i)
 	{
-		if (EQ[i] == '-') EQ.SetAt(i, wchar_t('+'));
+		if (EQ[i] == '-') EQ.SetAt(i, wchar_t('+')); // wide charatcter template
 		else if (EQ[i] == '+') EQ.SetAt(i, wchar_t('-'));
 	}
 
 	EQ += "=0";
 }
 
+// инициализировать начальные данные для разбора (парсинга)
 void FiniteAutomato::START()
 {
 	this->toNormalForm();
@@ -60,7 +63,6 @@ void FiniteAutomato::START()
 
 	ch = ::tolower(EQ[1]);
 	this->Analise();
-	int a = 5;
 }
 
 void FiniteAutomato::Analise()
