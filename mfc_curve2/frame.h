@@ -35,7 +35,7 @@ public:
 private:
 	void clearGraphics();
 
-	void plotEllipse(CPoint);
+	void plotEllipse(CPoint, bool);
 	void plotHiperbola();
 	void plotParabola();
 	void plotDot();

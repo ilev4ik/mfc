@@ -16,13 +16,17 @@ LeftTopFrame::LeftTopFrame(CWnd* pWnd, CRect rect)
 		);
 	this->ShowWindow(SW_SHOW);
 
+	// «агрузить в таблицу аксселераторов
 	LoadAccelTable(MAKEINTRESOURCE(IDR_LEFTTOPFRAME));
+
+	// введите уравнение
 	EQLabel = new CStatic();
+	// rectangle label
 	CRect r_lbl(
 		(rect.right - rect.left) / 3, 
 		(rect.bottom - rect.top) / 3, 
 		rect.right - (rect.right - rect.left) / 3, 
-		(rect.bottom - rect.top) /3 + 20
+		(rect.bottom - rect.top) /3 + 20 // высота курсора
 		);
 
 	CRect r_edit(
@@ -48,6 +52,7 @@ END_MESSAGE_MAP()
 afx_msg void LeftTopFrame::OnShift2()
 {
 	INT nLength = this->EQEditOld->GetWindowTextLengthW();
+	// сперва выделить, потом помен€ть
 	this->EQEditOld->SetSel(nLength, nLength);
 	this->EQEditOld->ReplaceSel(TEXT("^2"));
 }
@@ -70,7 +75,7 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 		pWnd
 		);
 
-	//popup menu
+	//всплывающее меню на правую кнопку мыши
 	hPopupMenu = CreatePopupMenu();
 	AppendMenu(hPopupMenu, MF_STRING, ID_TANGENT, TEXT(" асательна€/пол€ра"));
 	AppendMenu(hPopupMenu, MF_STRING, ID_NORMAL, TEXT("Ќормаль"));
@@ -91,11 +96,11 @@ RightTopFrame::RightTopFrame(CWnd* pWnd, CRect r)
 	maxX = ::GetSystemMetrics(SM_CXSCREEN);
 	maxY = ::GetSystemMetrics(SM_CYSCREEN);
 
+	// ѕолучить контекст клиентской части правого верхнего окна
 	CClientDC dc(this);
 
 	// —оздание совместимого контекста устройства и
 	// битового образа
-
 	m_memDC.CreateCompatibleDC(&dc);	// дл€ фона
 	m_bmp.CreateCompatibleBitmap(&dc, maxX, maxY);
 
@@ -138,7 +143,7 @@ void RightTopFrame::setBackground()
 	// создаЄм pen дл€ рисовани€
 	// и загрузим рисунок к буферный контекст
 
-	CPen pen_axes(PS_SOLID, 1, BLACK_PEN);
+	CPen pen_axes(PS_SOLID, 1, BLACK_PEN); // стиль, ширина, макрос цвета или RGB(r,g,b)
 	m_memDC.SelectObject(pen_axes);
 
 	// координатна€ ось
@@ -147,7 +152,7 @@ void RightTopFrame::setBackground()
 	m_memDC.MoveTo(0, O.y);
 	m_memDC.LineTo(rect.right, O.y);
 
-	// Ќарисуем стрелки Y и X соответственно
+	// Ќарисуем стрелки Y
 	m_memDC.MoveTo(O.x, 0);
 	m_memDC.LineTo(O.x - 5, rect.top + 10);
 	m_memDC.MoveTo(O.x, 0);
@@ -158,6 +163,7 @@ void RightTopFrame::setBackground()
 	// и ось X
 	m_memDC.TextOutW(rect.right - 10, O.y + 5, CString("x"));
 
+	// Ќарисуем стрелки X
 	m_memDC.MoveTo(rect.right, O.y);
 	m_memDC.LineTo(rect.right - 10, O.y - 5);
 	m_memDC.MoveTo(rect.right, O.y);
@@ -198,12 +204,16 @@ void RightTopFrame::plotDot()
 	m_picDC.Ellipse(O.x - 3, O.y - 3, O.x + 3, O.y + 3);
 }
 
-void RightTopFrame::plotEllipse(CPoint C)
+// по умолчанию строим в канонических координатах
+void RightTopFrame::plotEllipse(CPoint C, bool iscanon = 1)
 {
 	int a = step*pf.ca, b = step*pf.cb;
 
-	if ((C == Z) && (pf.a(1,1) > pf.a(2,2)))
+	if (iscanon) {}
+	else if ((C == Z) && (pf.a(1, 1) > pf.a(2, 2)))
+	{
 		std::swap(a, b);
+	}
 
 	
 	m_picDC.Ellipse(
@@ -428,7 +438,7 @@ void RightTopFrame::plotFeatures()
 	brush_center.CreateSolidBrush(RGB(0, 255, 0));
 
 	m_picDC.SelectObject(pen_dir);
-
+	m_picDC.SelectObject(&p_bmp);
 
 	// директриса
 	for (INT i = 0; i < pf.dir.size(); ++i)
@@ -550,8 +560,8 @@ afx_msg void RightTopFrame::OnPaint()
 	pDC->BitBlt(0, 0, rect.right, rect.bottom, &m_memDC, 0, 0, SRCCOPY);
 
 	// перо дл€ фигур
-	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));
-	CPen dpen(PS_DOT, 1, RGB(0,0,0));
+	CPen pen(PS_SOLID, 2, RGB(0, 0, 0));	// в декартовых координатах
+	CPen dpen(PS_DOT, 1, RGB(0,0,0));		// в канонических координатах
 
 	if (p_isdefined)
 	{
@@ -559,15 +569,16 @@ afx_msg void RightTopFrame::OnPaint()
 		this->plotFeatures();
 
 		// мен€ем инструменты
-		m_picDC.SelectStockObject(NULL_BRUSH);
+		m_picDC.SelectStockObject(NULL_BRUSH); // прозрачна€ кисть
 		m_picDC.SelectObject(dpen);
+
 		switch (pf.CURVE_STATE)	
 		{
 		case ELLIPS:
 		{
 			this->plotEllipse(O);	// канон
 			m_picDC.SelectObject(pen);
-			this->plotEllipse(Z);	// декарт
+			this->plotEllipse(Z, NULL);	// декарт
 			//this->GetRotatedBitmapNT((HBITMAP)p_bmp.m_hObject, M_PI/2, RGB(255, 255, 255));
 			break;
 		}
