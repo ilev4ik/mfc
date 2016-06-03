@@ -35,7 +35,7 @@ public:
 private:
 	void clearGraphics();
 
-	void plotEllipse(CPoint, bool);
+	void plotEllipse(CPoint, int);
 	void plotHiperbola();
 	void plotParabola();
 	void plotDot();
@@ -49,7 +49,7 @@ private:
 
 
 	// graphics transformation functions
-	void GetRotatedBitmapNT(HBITMAP, float, COLORREF);
+	void plotRotatedBM(float);
 
 	// point for context menu (menu point)
 	CPoint mp;	// точка в кординатах окна
@@ -69,18 +69,18 @@ private:
 	CPoint extra;	// точка в координатах человеческих со смещение от O (см. выше)
 	CRect rect;
 
-	CDC m_memDC;
-	CDC m_picDC;
+	CDC gDC;		// grid
+	CDC dDC;		// decart
+	CDC cDC;		// canon
 
-	CBitmap m_bmp; // memory
-	CBitmap p_bmp; // picture
+	CBitmap g_bmp;	
+	CBitmap d_bmp;	
+	CBitmap c_bmp;	
 
 	int maxX, maxY;
 	COLORREF m_textColor;
 
-	int GetCBitmapWidth(const CBitmap &);
-	int GetCBitmapHeight(const CBitmap &);
-
+	// карта сообщений должна быть объявлена в самом конце описания класса
 	DECLARE_MESSAGE_MAP()
 };
 
