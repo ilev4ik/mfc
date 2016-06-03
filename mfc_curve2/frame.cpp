@@ -51,9 +51,10 @@ END_MESSAGE_MAP()
 
 afx_msg void LeftTopFrame::OnShift2()
 {
-	INT nLength = this->EQEditOld->GetWindowTextLengthW();
+	// узнаём текущую позицию курсора
+	DWORD pos = this->EQEditOld->GetSel();
 	// сперва выделить, потом поменять
-	this->EQEditOld->SetSel(nLength, nLength);
+	this->EQEditOld->SetSel(pos, pos);
 	this->EQEditOld->ReplaceSel(TEXT("^2"));
 }
 
