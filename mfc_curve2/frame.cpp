@@ -319,13 +319,12 @@ afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 		{
 			tip->SetWindowTextW(TEXT(""));
 		}
-		tip->ShowWindow(SW_RESTORE);
 	}
 
 	if (pf.center != nullptr)
 	{
 		if (abs(O.x + step*pf.center->x - pos.x) < 5 &
-			abs(O.y + step*pf.center->y - pos.y) < 5)
+			abs(O.y - step*pf.center->y - pos.y) < 5)
 		{
 			tip->SetWindowTextW(TEXT("Центр"));
 			return;
@@ -334,7 +333,6 @@ afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 		{
 			tip->SetWindowTextW(TEXT(""));
 		}
-		tip->ShowWindow(SW_RESTORE);
 	}
 
 	for (int i = 0; i < pf.dir.size(); ++i)
@@ -348,8 +346,8 @@ afx_msg void RightTopFrame::OnMouseMove(UINT, CPoint pos)
 		{
 			tip->SetWindowTextW(TEXT(""));
 		}
-		tip->ShowWindow(SW_RESTORE);
 	}
+
 }
 
 void RightTopFrame::plotTangent()
